@@ -1,0 +1,177 @@
+button {
+  font-family: Helvetica, sans-serif;
+}
+
+:root {
+  --button-inactive: rgb(59, 55, 55);
+  --button-active: rgb(231, 82, 56);
+  --accent-dark: rgb(0, 0, 0);
+}
+
+#root {
+  height: 100%;
+}
+
+h1, h2, h3, h4, h5 {
+  text-align: center;
+  font-family: Helvetica, sans-serif;
+}
+
+.App {
+  flex-direction: row;
+}
+@media  (max-width: 600px)  {
+  .App {
+    display: block;
+    margin: auto;
+    flex-direction: column;
+  }
+}
+
+@media  (max-width: 600px)  {
+  .App {
+    display: block;
+    margin: auto;
+    flex-direction: column;
+  }
+}
+
+@media screen and (min-width: 800px) {
+  .App {
+    max-width: 800px;
+  }
+}
+html, body {
+  width: 100%;
+  height: 100%;
+  background:linear-gradient(0deg, rgb(17, 54, 78) 0%,  rgb(118, 118, 118) 100%)
+}
+
+
+.App_header {
+  width: 100%;
+  height: 50px;
+  background: rgb(255, 255, 255);
+  /* a shadow that starts fully opaque at the top, then fades vertically */
+  box-shadow: 0 0 10px 10px rgb(0, 0, 0);
+  position: static;
+}
+
+.MonoidDisplay_outer {
+  margin-top: 20px;
+  margin: 0px auto;
+  display: flex;
+  flex-direction: column;
+}
+.MonoidDisplay_header {
+  width: calc(100% - 20px -2px);
+  min-width: 100px;
+  height: 50px;
+  border: 1px solid grey;
+  margin: 10px;
+
+  /* a shadow that starts fully opaque at the top, then fades vertically */
+
+
+}
+
+.MainSelector_inner {
+
+}
+
+.MainSelector_button {
+  border-radius: 1px;
+}
+
+.SubgroupDiagram {
+  width: 100%; 
+  aspect-ratio: 1, 
+}
+.SubgroupDiagram div:active {
+
+}
+foreignObject > div {
+  margin: 0 auto;
+  width: 100%;
+  height: 100%; 
+  border-radius: 30%;
+  transition-property: background-color;
+  transition:cubic-bezier(1, 0, 0, 1) 0.1s;
+}
+.SubgroupDiagram span {
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 7px;
+  position: absolute;
+  width: 100%;
+  text-align: center;
+  top: -4px;
+  left: 1px;
+  color: white;
+  user-select: none;
+}
+
+foreignObject span > div {
+  margin: 0 auto;
+  width: min-content;
+  
+}
+
+.ShapeDisplay {
+  
+}
+.ShapeDisplay > div {
+  background: rgb(255, 255, 255);
+}
+
+.CayleyGraph__holder {
+  margin-top: 180px;
+  width: 400px;
+  height: 306px;
+  border: 1px solid red;
+}
+
+.SubgroupDiagram__holder {
+  background: rgb(255, 255, 255);
+}
+
+.SubgroupDiagram__holder > div {
+  display: flex;
+  min-height: 25px;
+  justify-content: center;
+  padding-top: 5px;
+}
+
+.MonoidDisplay_buttons {
+  height: 50px; display: flex; overflow-x: scroll;
+}
+
+.generator-button {
+  display: inline-flex;
+  margin: 0 auto;
+  flex-basis: 100%;
+  justify-content: center;
+  padding: 10px;
+}
+
+.SubgroupChoice__outer {
+  display: flex;
+  height: "30px";
+  background: white;
+  width: 100%;
+}
+
+.SubgroupChoice__outer > div {
+  align-items: center;
+  text-align: center;
+  justify-content: center;
+  display: block;
+}
+
+.GroupInfo__holder {
+  background: white;
+  height: 100%;
+}
+
+.GroupInfo__holder > p > span {
+  text-align: center;
+}
