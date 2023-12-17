@@ -65,13 +65,7 @@ function App() {
   }
   return (
     
-      <div 
-        className="App"
-        style={{
-        display: "flex", 
-        height: "100%",
-        width: "100%",
-      }}>
+      <div className="App">
     <div style={{width: "60vw", height: "45vh", display:"flex", margin: "0 auto", marginTop: "200px"}} >
       <div style={{width:"50%"}}>
           <FGIMonoidDisplay<Indexed<Transform>> shape={geomName} monoid={currentMonoid} generators={controlVals.useAllValues ? currentMonoid.values : generators}/* determined by the point in the subgroup diagram*/ updateHash={""} subgroup={subgroupChoiceIndex + "," + subgroupClassIndex}>
