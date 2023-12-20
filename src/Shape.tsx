@@ -60,9 +60,9 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
     to: { t: 1 },
     reset: true,
     config: {
-      easing: easings.easeOutExpo,
-      duration: 2000,
+      easing: easings.easeInOutCirc,
       clamp: true,
+      duration: 300,
     },
   });
   // useFrame to update the rotation value
@@ -70,7 +70,7 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
     const intermediateRotation = new Quaternion().slerpQuaternions(
       ref.current.quaternion,
       transform.from.rotation,
-      0.5
+      0.3
     );
     (ref.current.quaternion as Quaternion).slerpQuaternions(
       intermediateRotation,

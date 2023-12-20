@@ -29,18 +29,20 @@ export type CayleyGraphVertex = {
 export type CayleyGraphEdges = [number, number][][];
 
 export type CayleyGraphProps = {
-  monoid: Monoid<Indexed<Transform>>;
   graphVertices: CayleyGraphVertex[];
   graphEdges: CayleyGraphEdges;
   transform: Indexed<Transform>;
 };
 
 export const CayleyGraph = function ({
-  monoid,
   transform: { index, value },
   graphVertices,
   graphEdges,
 }: CayleyGraphProps): JSX.Element {
+
+  if (value == null) throw new Error("[CayleyGraph] transform.value is null");
+  if (graphVertices == null) throw new Error("[CayleyGraph] graphVertices is null");
+
   const ptrRef = useRef(null);
 
   const [localStepIndex, setLocalStepIndex] = useState(0);

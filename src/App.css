@@ -180,3 +180,41 @@ foreignObject span > div {
 .GroupInfo__holder > p > span {
   text-align: center;
 }
+
+.CayleyGraphEditor__container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffffaa;
+  overflow: hidden;
+  }
+  
+  .CayleyGraphEditor__outer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 50vw;
+  height: 80vh;
+  background: white;
+  border: 1px solid black;
+  z-index: 1;
+  padding: 30px;
+  }
+  
+  .CayleyGraphEditor__button {
+  border: 2px solid grey;
+  padding: 5px;
+  border-radius: 5px;
+  background: #40a6f440;
+  }
+
+  .CayleyGraphEditor__body {
+    width: 100%;
+    aspect-ratio: 1;
+    border: 1px solid black;
+    max-width: 500px;
+    margin: 0 auto;
+  }

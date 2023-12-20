@@ -10,42 +10,41 @@ import { Quaternion, Vector3 } from "three";
 import { DefaultVertices } from "../logic/cayleyTables";
 
 
-
+export type SetTransformAction = React.Dispatch<React.SetStateAction<Indexed<Transform>>>
 export type MonoidDisplayProps<T extends Indexed<Transform>> = {
-  monoid: Monoid<Indexed<Transform>> ;
+  monoid: Monoid<Indexed<Transform>>;
   generators: T[];
   children: ReactElement<typeof ShapeDisplay>
     | Array<ReactElement<typeof ShapeDisplay>>;
     shape: keyof typeof defaultShapes;
   updateHash: string;
   subgroup: string;
+  monoidValue: T;
+  setMonoidValue: SetTransformAction;
 };
 
 export const FGIMonoidDisplay = function<T extends Indexed<Transform>> ({
+  // Responsible for managing 
   monoid,
   generators,
-  children,
-  shape,
-  subgroup
+  monoidValue,
+
+  setMonoidValue
 }: MonoidDisplayProps<Indexed<Transform>>) {
   
   const { identity, multiply, name } = monoid;
 
   const [stepIndex, setStepIndex] = useState(0);
-  const [monoidValue, setMonoidValue] = useState(identity);
+
 
   const composeStateWith = (x: T) => {
     const nextValue = multiply(monoidValue, x);
     setMonoidValue(nextValue);
   }
-  useEffect(() => {
-    setMonoidValue(identity);
-  }, [shape, subgroup]);
 
-  let childrenArray = Children.toArray(children);
 
-  
 
+  /*
   const newElements = useMemo(() => (Children).map(childrenArray, (child, i) => (
     (
       (child as JSX.Element).type === ShapeDisplay 
@@ -56,7 +55,9 @@ export const FGIMonoidDisplay = function<T extends Indexed<Transform>> ({
         key: `MonoidDisplay_element1#${i}`,
         stepIndex: stepIndex,
         transform: monoidValue,
-        style: /* new style including the current: */ Object.assign({}, (child as JSX.Element).props.style, { 
+        style:  
+        //new style including the current:  
+        Object.assign({}, (child as JSX.Element).props.style, { 
           position: "absolute",
           top: "0px",
           left: "0px",
@@ -68,7 +69,7 @@ export const FGIMonoidDisplay = function<T extends Indexed<Transform>> ({
       })
       : child
   )), [monoidValue, shape]);
-
+      */
   useEffect(() => {
     console.log("Set new monoid value:", monoidValue);
   }, [monoidValue, stepIndex])
@@ -92,7 +93,7 @@ export const FGIMonoidDisplay = function<T extends Indexed<Transform>> ({
             </button>
         ))}
     </div>
-      <div>{...newElements}</div> 
+   
       
     </div>
   );

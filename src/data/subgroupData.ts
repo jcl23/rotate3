@@ -1,3 +1,5 @@
+import { GeometryName } from "../DefaultMeshes";
+
 export type Subgroup = {
     name: string;
     generators: number[];
@@ -6,9 +8,7 @@ export type Subgroup = {
 export default ({
 Cube: [
     // 0
-        [{
-            name: "1", generators: []
-        }],
+        [{ name: "1", generators: [] }],
     // 1
         [{ 
             name: "2", generators: [17]
@@ -79,8 +79,16 @@ Cube: [
     // 10,
         [{ name: "All Rotations", generators: [1, 2, 5]}],
     ],
-Icosahedron: [],
-Dodecahedron: [],
-Tetrahedron: [],
-Octahedron: []
-} as Record<string, Subgroup[][]>)
+Icosahedron: [
+    [{ name: "1", generators: [] }],
+],
+Dodecahedron: [
+    [{ name: "1", generators: [] }],
+],
+Tetrahedron: [
+    [{ name: "1", generators: [] }],
+],
+Octahedron: [
+    [{ name: "1", generators: [] }],
+]
+} as Record<GeometryName, Subgroup[][]>)
