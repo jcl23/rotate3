@@ -22,6 +22,7 @@ import { useControls } from "leva";
 import { makeSubmonoid } from "./monoid/makeMonoid.ts";
 import { GeometryName } from "./DefaultMeshes.tsx";
 import { CayleyGraphEditor } from "./ui/CayleyGraphEditor.tsx";
+
 function App() {
 
 
