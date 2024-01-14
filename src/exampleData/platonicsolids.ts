@@ -4,7 +4,7 @@ import { Vector } from "three/examples/jsm/physics/RapierPhysics.js";
 import { DodecahedronGeometry, IcosahedronGeometry, OctahedronGeometry, Quaternion, TetrahedronGeometry, Vector3 } from "three/src/Three.js";
 import { FinitelyGeneratedMonoid } from "../monoid/IndexedMonoid";
 import { POS_ID, getPointsFromGeom, makeMonoidFromGeometry } from "../monoid/makeMonoid";
-import { defaultShapes } from "../DefaultMeshes";
+import { GroupName, defaultShapes } from "../DefaultMeshes";
 import { IndexedFGM } from "../monoid/IndexedMonoid";
 type SolidNames =
   | "Cube"
@@ -28,3 +28,6 @@ export const SolidMonoids = {
   Dodecahedron: dodMonoid,
 };
 
+export const monoids: Partial<Record<GroupName, IndexedFGM<any>>> = {
+  
+}
