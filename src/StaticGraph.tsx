@@ -6,12 +6,11 @@ import {
   LineBasicMaterial,
   Vector3,
 } from "three";
-import { CayleyGraphEdges } from "./CayleyGraph";
+import { CayleyGraphData, CayleyGraphEdges } from "./CayleyGraph";
 import { GEN_COLORS } from "./cfg/colors";
 
-export type StaticGraphProps = {
-  graphEdges: [Vector3, Vector3][][];
-};
+import { i_edge } from "./ui/CayleyGraphEditor";
+
 
 const DEPTH = 0.01;
 
@@ -35,24 +34,44 @@ function edgesToCylinders(edgesGeometry, thickness) {
   }
 }
 
-export const StaticGraph = function ({ graphEdges }: StaticGraphProps) {
+export const StaticGraph = function ({ edges, vertices }: CayleyGraphData) {
   const toLine = ([from, to]: [Vector3, Vector3], color: Color) => {
-    const geometry = new BufferGeometry().setFromPoints([from, to]);
-    geometry.translate(0, 0, -DEPTH);
-    const material = new LineBasicMaterial({ color });
-    const line = new Line(geometry, material);
-    return line;
+    if (color === undefined) {
+      throw new Error("color is undefined");
+    }
+    const div = document.createElement("div");
+    const length = from.distanceTo(to);
+    let slope = (to.y - from.y) / (to.x - from.x);
+    if (slope === Infinity) slope = 1000000;
+    const angle = Math.atan(slope);
+    const x = (from.x + to.x) / 2;
+    const y = (from.y + to.y) / 2;
+    const width = (to.x - from.x);
+    const height = (to.y - from.y);
+    // convert this to react style element 
+    return <div style={{
+      transform: `translate(${-width / 2 + x}px, ${height / 2 + y}px) rotate(${angle}rad)`,
+      width: `${length}px`,
+      height: `${3}px`,
+      background: color.getStyle(),
+      position: "absolute",
+      zIndex: "100",
+      borderRadius: "3px",
+      transformOrigin: "left"
+    }}/>;
+
+
+
   };
+
+
+  const listToReturn = edges.map((list, listIndex) => list.map(([i, j], edgeIndex) => {
+    const [p1, p2] = i_edge ([vertices[i], vertices[j]]);
+    return toLine([p1, p2], GEN_COLORS[listIndex % GEN_COLORS.length]);
+  })).flat(1);
   return (
-    <mesh>
-      {graphEdges.map((list, listIndex) =>
-        list.map(([from, to], i) => (
-          <primitive
-            key={`graphEdgePrimitive${i}`}
-            object={toLine([from, to], GEN_COLORS[listIndex])}
-          />
-        ))
-      )}
-    </mesh>
+    <>
+      {listToReturn}
+      </>
   );
 };

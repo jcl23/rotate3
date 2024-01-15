@@ -1,3 +1,10 @@
+import { GeometryName } from "../DefaultMeshes";
+
+export type SubgroupDiagramData = {
+    positions: [number, number][];
+    poset: [number, number][];
+    labels: string[];
+}
 export default {
     ["Cube"]:{
 
@@ -55,4 +62,4 @@ export default {
     
 
 
-}
+} as Record<GeometryName, SubgroupDiagramData>;

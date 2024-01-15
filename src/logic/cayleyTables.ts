@@ -12,7 +12,7 @@ const isEqualApprox = function(a: Transform, b: Transform, rotDelta: number, pos
 export const enumerateTransforms = function(monoid: FinitelyGeneratedMonoid,  delta = 0.05): Transform[] {
     // Hope its finite
         
-    const valueSet = new Array<Transform>();    
+    const valueSet = new Array<E3>();    
     valueSet.push(monoid.identity);
     let queue = [monoid.identity];
 
@@ -45,10 +45,10 @@ export const enumerateTransforms = function(monoid: FinitelyGeneratedMonoid,  de
     return [...valueSet];
 }
 
-export function makeCayleyTable(monoid: FinitelyGeneratedMonoid): Indexed<Transform>[][] {
+export function makeCayleyTable(monoid: FinitelyGeneratedMonoid): Indexed<E3>[][] {
     const valueSet = enumerateTransforms(monoid);
     const numElements = valueSet.length;
-    const cayleyTable = Array<Indexed<Transform>[]>(numElements).fill([]).map(() => Array<Indexed<Transform> | null>(numElements).fill(null));
+    const cayleyTable = Array<Indexed<E3>[]>(numElements).fill([]).map(() => Array<Indexed<E3> | null>(numElements).fill(null));
     for (let i = 0; i < numElements; i++) {
         for (let j = 0; j < numElements; j++) {
             const result = monoid.multiply(valueSet[i], valueSet[j]);
@@ -61,7 +61,7 @@ export function makeCayleyTable(monoid: FinitelyGeneratedMonoid): Indexed<Transf
     }
     // typescript assert that the table hsa non-null values
 
-    return cayleyTable as Indexed<Transform>[][];
+    return cayleyTable as Indexed<E3>[][];
 }
 
 const findEdges = function(cayleyTable: number[][], start: number, step: number) {
@@ -88,25 +88,26 @@ export const manualReindexArrays = {
     ]
 }
 export const DefaultVertices = {
-    box: [0, 1, 2, 3].map(turn => [
-    new Vector2(0, 0),              
+    Cube: [0, 1, 2, 3].map(turn => [
+        new Vector2(0, 0),              
+        
+                                        
+                                new Vector2(60, 20),
     
-                                    
-                            new Vector2(60, 20),
-
-
-                                new Vector2(70, 50),
-
-                                    
-            new Vector2(20, 60),
-                        new Vector2(50, 70),
-                                        new Vector2(80, 80)
-    ].map((v) => v.clone().rotateAround(new Vector2(100, 100), turn * Math.PI / 2)).map(
-        (v, j) => ({
-            index: turn * 6 + j,
-            position: v,
-        })
-    ))    
-    .flat(),
+    
+                                    new Vector2(70, 50),
+    
+                                        
+                new Vector2(20, 60),
+                            new Vector2(50, 70),
+                                            new Vector2(80, 80)
+        ].map((v) => v.clone().rotateAround(new Vector2(100, 100), turn * Math.PI / 2)))/*.map(
+            (v, j) => ({
+                index: turn * 6 + j,
+                position: v,
+            })
+        ))  */  
+        .flat()
 }
+    
 

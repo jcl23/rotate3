@@ -11,7 +11,7 @@ import { CameraControls, Environment, Lightformer, PerformanceMonitor } from "@r
 export type ShapeDisplayProps = {
     children?: JSX.Element | JSX.Element[];
     shape: keyof typeof defaultShapes;
-    transform: Indexed<Transform>;
+    transform: Indexed<E3>;
     stepIndex: number;
     cameraType:
       | "front-facing"
@@ -30,7 +30,7 @@ export const ShapeDisplay = function ({
   
     const [localStepIndex, setLocalStepIndex] = useState(0);
   
-    const [transformStep, setTransformStep] = useState<Step<Transform>>({
+    const [transformStep, setTransformStep] = useState<Step<E3>>({
       from: { rotation: new Quaternion(), position: new Vector3() } as Transform,
       to: { rotation: new Quaternion(), position: new Vector3() } as Transform,
     });

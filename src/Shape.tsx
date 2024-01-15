@@ -44,7 +44,7 @@ import { createMultiMaterialObject } from "three/examples/jsm/utils/SceneUtils.j
 export type Step<T> = { from: T; to: T };
 export type ShapeProps = {
   shape: keyof typeof defaultShapes;
-  transform: Step<Transform>;
+  transform: Step<E3>;
 };
 
 
@@ -62,7 +62,7 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
     config: {
       easing: easings.easeInOutCirc,
       clamp: true,
-      duration: 300,
+      duration: 500,
     },
   });
   // useFrame to update the rotation value

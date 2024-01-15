@@ -10,7 +10,6 @@ import {
 import { Monoid } from "./monoid/Monoid";
 import { Indexed } from "./monoid/IndexedMonoid";
 import { manualReindexArrays } from "./logic/cayleyTables";
-import { useSpring, useSpringValue } from "@react-spring/three";
 import { forwardRef, useEffect, useMemo, useRef, useState } from "react";
 import { easings } from "@react-spring/three";
 import { Canvas, useFrame } from "@react-three/fiber";
@@ -18,44 +17,42 @@ import { Step } from "./Shape";
 import { Pointer } from "./CayleyGraphPointer";
 import { Transform } from "./Display";
 import { MyCamera } from "./Camera";
-import { defaultShapes } from "./DefaultMeshes";
-import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
 import { StaticGraph } from "./StaticGraph";
-export type CayleyGraphVertex = {
-  position: Vector2;
-  index: number;
-};
+
+export type CayleyGraphVertex = Vector2;
 
 export type CayleyGraphEdges = [number, number][][];
 
-export type CayleyGraphProps = {
-  graphVertices: CayleyGraphVertex[];
-  graphEdges: CayleyGraphEdges;
-  transform: Indexed<Transform>;
+export type CayleyGraphData = {
+  vertices: CayleyGraphVertex[];
+  edges: CayleyGraphEdges;
+};
+export type CayleyGraphProps = CayleyGraphData & {
+  transform: Indexed<E3>;
 };
 
 export const CayleyGraph = function ({
   transform: { index, value },
-  graphVertices,
-  graphEdges,
-}: CayleyGraphProps): JSX.Element {
+  vertices,
+  edges,
+}: CayleyGraphData & {transform: {index: number, value: Transform}}): JSX.Element {
 
   if (value == null) throw new Error("[CayleyGraph] transform.value is null");
-  if (graphVertices == null) throw new Error("[CayleyGraph] graphVertices is null");
+  if (vertices == null) throw new Error("[CayleyGraph] vertices is null");
 
   const ptrRef = useRef(null);
 
   const [localStepIndex, setLocalStepIndex] = useState(0);
 
   const reindex = manualReindexArrays.box;
-  const monoidElementToPosition = (index: number): Vector3 => {
-    const vertex = graphVertices[index];
+  function monoidElementToPosition (index: number): Vector3 {
+    const vertex = vertices[index];
     if (vertex === undefined) {
       throw new Error(`vertex is undefined for element ${index}`);
     }
     return new Vector3(
-      -0.8 + 0.008 * vertex.position.x,
-      0.8 - 0.008 * vertex.position.y,
+      -0.8 + 0.008 * vertex.x,
+      0.8 - 0.008 * vertex.y,
       0
     );
   };
@@ -88,12 +85,11 @@ export const CayleyGraph = function ({
     return <Pointer ref={ptrRef} transform={indexedStep} />;
   }, [indexedStep, value]);
 
-  const initialEdgesList: [number, number][] = graphEdges
-    .flat()
-    .map(([from, to]) => [
+  const initialEdgesList: [number, number][][] = edges
+    .map(list => list.map(([from, to]) => [
       manualReindexArrays.box[from],
       manualReindexArrays.box[to],
-    ]);
+    ]));
   
     const [edgesList, setEdgesList] = useState(initialEdgesList);
 
@@ -109,17 +105,17 @@ export const CayleyGraph = function ({
         >
           
             <svg viewBox="-20 -20 240 240" width={240} height={240} style={{margin: 0, padding: 0, width:"100%", height: "100%", background: "white"}}>
-                {graphVertices.map(({position, index}, i) => {
+                {vertices.map((v, i) => {
                     return (
                         <>
                             <circle
                                 key={`CayleyGraph_circle#${i}`}
-                                cx={position.x}
-                                cy={position.y}
+                                cx={v.x}
+                                cy={v.y}
                                 r={1}
                                 color="black"
                             />
-                            <text x={position.x + 3} y={position.y + 2} fontSize="0.6em">{index}</text>
+                            <text x={v.x + 3} y={v.y + 2} fontSize="0.6em">{index}</text>
                         </>
                             )
                 })}
@@ -142,15 +138,11 @@ export const CayleyGraph = function ({
               <pointLight position={[0, 4, 2]} intensity={20} />
 
               {stableComponent}
-              <StaticGraph
-                graphEdges={graphEdges
-                  .map(list => list
-                  .map(([i, j]) => [
-                    monoidElementToPosition(i),
-                    monoidElementToPosition(j),
-                  ]))}
-              />
             </Canvas>
+            <StaticGraph
+              edges={edges}
+              vertices={vertices}
+            />
           </div>
         </div>
       </div>

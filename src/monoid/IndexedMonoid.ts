@@ -8,19 +8,22 @@ export type IndexedMonoid<T> = Monoid<Indexed<T>>;
 
 
 
-export interface FinitelyGeneratedMonoid extends Monoid<Transform> {
-    generators: Transform[];
+export interface FinitelyGeneratedMonoid<T> extends Monoid<T> {
+    generators: T[];
     // values: Transform[];
 }
-export interface IndexedFGM extends IndexedMonoid<Transform> {
-    generators: Indexed<Transform>[];
-    values: Indexed<Transform>[];
-    cayleyTable?: Indexed<Transform>[][];
-    extraRotations?: Quaternion[];
+export interface IndexedFGM<T> extends IndexedMonoid<T> {
+    generators: Indexed<T>[];
+    values: Indexed<T>[];
+    cayleyTable?: Indexed<T>[][];
+    // extraRotations?: Quaternion[];
 }
 
 
-export const indexMonoid = (monoid: FinitelyGeneratedMonoid, delta: number): IndexedFGM => {
+
+
+
+export const indexMonoid = <T>(monoid: FinitelyGeneratedMonoid<T>, delta = 0.01): IndexedFGM<T> => {
     let identity = { index: 0, value: monoid.identity };
     
     
@@ -28,7 +31,7 @@ export const indexMonoid = (monoid: FinitelyGeneratedMonoid, delta: number): Ind
 
     let values = cayleyTable[0];
 
-    let multiply = (a: Indexed<Transform>, b: Indexed<Transform>): Indexed<Transform> => {
+    let multiply = (a: Indexed<T>, b: Indexed<T>): Indexed<T> => {
         const { index, value } = cayleyTable[a.index][b.index];
         if (value == undefined) {
             throw new Error("Index out of bounds"); 

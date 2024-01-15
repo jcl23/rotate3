@@ -5,7 +5,6 @@ export type Monoid<T> = {
     name: string;
     identity: T;
     multiply: (a: T, b: T) => T;
-    generators?: T[];
 };
 
 export type QuaternionMonoid = Monoid<Quaternion>;

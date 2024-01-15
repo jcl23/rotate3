@@ -1,44 +1,41 @@
-import { ReactElement, cloneElement, useEffect, useMemo, useState } from "react";
-import { ShapeDisplay } from "../ShapeDisplay";
-import React, { Children } from "react";
-import { Monoid } from "./Monoid";
-import { Transform } from "../Display";
-import { Indexed } from "./IndexedMonoid";
-import { CayleyGraph } from "../CayleyGraph";
+import {useEffect, useMemo, useState } from "react";
+import React from "react";
+import { Indexed, IndexedMonoid } from "./IndexedMonoid";
 import { defaultShapes } from "../DefaultMeshes";
-import { Quaternion, Vector3 } from "three";
-import { DefaultVertices } from "../logic/cayleyTables";
 
 
-export type SetTransformAction = React.Dispatch<React.SetStateAction<Indexed<Transform>>>
-export type MonoidDisplayProps<T extends Indexed<Transform>> = {
-  monoid: Monoid<Indexed<Transform>>;
-  generators: T[];
-  children: ReactElement<typeof ShapeDisplay>
-    | Array<ReactElement<typeof ShapeDisplay>>;
+
+export type SetAction<T> = React.Dispatch<React.SetStateAction<T>>
+export type MonoidDisplayProps<T> = {
+  monoid: IndexedMonoid<T>;
+  generators: Indexed<T>[];
+  // children: ReactElement<typeof ShapeDisplay>
+  //   | Array<ReactElement<typeof ShapeDisplay>>;
     shape: keyof typeof defaultShapes;
   updateHash: string;
   subgroup: string;
-  monoidValue: T;
-  setMonoidValue: SetTransformAction;
+  inclusion: (i: number) => number;
+  monoidValue: Indexed<T>;
+  setMonoidValue: SetAction<Indexed<T>>;
 };
 
-export const FGIMonoidDisplay = function<T extends Indexed<Transform>> ({
+export const FGIMonoidDisplay = function<T> ({
   // Responsible for managing 
   monoid,
   generators,
   monoidValue,
 
   setMonoidValue
-}: MonoidDisplayProps<Indexed<Transform>>) {
+}: MonoidDisplayProps<T>) {
   
   const { identity, multiply, name } = monoid;
 
   const [stepIndex, setStepIndex] = useState(0);
 
 
-  const composeStateWith = (x: T) => {
+  const composeStateWith = (x: Indexed<T>) => {
     const nextValue = multiply(monoidValue, x);
+    const includedValue = 
     setMonoidValue(nextValue);
   }
 

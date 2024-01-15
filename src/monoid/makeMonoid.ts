@@ -1,6 +1,6 @@
 import { Box3, BufferGeometry, Quaternion, TypedArray, Vector3 } from "three";
 import { FinitelyGeneratedMonoid, Indexed, IndexedFGM, indexMonoid } from "../monoid/IndexedMonoid";
-import { Transform } from "../Display";
+import { E3 } from "../Display";
 
 export const getCenter = (geom: BufferGeometry) => (new Box3().setFromPoints(getPointsFromGeom(geom)).getCenter(new Vector3()));
 
@@ -32,12 +32,12 @@ export const getPointsFromGeom = function(geom: BufferGeometry): Vector3[] {
 export const POS_ID = new Vector3();
 export const ROT_ID = new Quaternion();
 
-export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: number, name: string, extraRotations = []) : IndexedFGM {
+export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: number, name: string, extraRotations = []) : IndexedFGM<E3> {
     const center = new Vector3(0, 0, 0);
     const points =  getPointsFromGeom(geom);
     const rotations = points.map(point => new Quaternion().setFromAxisAngle(point.normalize(), Math.PI * 2 / degree));
     Array.prototype.push.apply(rotations, extraRotations);
-    const monoid: FinitelyGeneratedMonoid = {
+    const monoid: FinitelyGeneratedMonoid<E3> = {
         generators: rotations.map((rotation) => ({ rotation, position: center })),
         identity: { rotation: ROT_ID, position: center },
         multiply: ({ rotation: r1, position: p1 }, { rotation: r2, position: p2 }) => ({ rotation: new Quaternion().multiplyQuaternions(r2, r1), position: new Vector3().addVectors(p1, p2) })
@@ -49,12 +49,12 @@ export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: num
     return returnMonoid;
 }
 
-export const makeSubmonoid = function(m: IndexedFGM, generators: Indexed<Transform>[]): IndexedFGM {
+export const makeSubmonoid = function<T>(m: IndexedFGM<T>, generators: Indexed<T>[]): IndexedFGM<T> {
     
-const values: Indexed<Transform>[] = [];
-    let queue: Indexed<Transform>[] = [m.identity];
+const values: Indexed<T>[] = [];
+    let queue: Indexed<T>[] = [m.identity];
     while (queue.length) {
-        const newQueue: Indexed<Transform>[] = [];
+        const newQueue: Indexed<T>[] = [];
         let element;
         while (element = queue.shift()) {
             values.push(element);
@@ -70,7 +70,7 @@ const values: Indexed<Transform>[] = [];
         queue = newQueue;
     }
     
-    const monoid: IndexedFGM = {
+    const monoid: IndexedFGM<T> = {
         generators: generators.slice(),
         identity: m.identity,
         multiply: m.multiply,

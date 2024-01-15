@@ -9,22 +9,22 @@ import ReactHotkeys from "react-hot-keys";
 import { Vector2, Vector3 } from "three";
 import { StaticGraph } from "../StaticGraph";
 //cayleygraphdata type
-type CayleyGraphData = Vector2[];
+import { CayleyGraphData } from "../data/cayleyGraphData";
 export type CayleyGraphEditorProps = {
     show: boolean;
     hide: () => void;
 }
 
-type GraphEdge = [Vector2, Vector2];
-const i_edge = (graphEdge: GraphEdge) => {
+type GraphEdge = [number, number]; // indices [from, to]
+export const i_edge = (graphEdge: [Vector2, Vector2]) => {
     // include the vector from R2 into R3
     const [from, to] = graphEdge;
     return [new Vector3(from.x, from.y, 0), new Vector3(to.x, to.y, 0)];    
 }
 const CLUSTER_THRESHOLD = 6;
-const VERTEX_RADIUS = 10;
+const VERTEX_RADIUS = 4;
 const MAX_SIZE = 200;
-type CayleyGraphEditorState = "Remove" | "Move" | "Arrow";
+type CayleyGraphEditorState = "Remove" | "Move" |"Arrow";
 export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
     
     const [, forceUpdate] = useReducer(x => x + 1, 0);
@@ -34,26 +34,23 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
 
     const [graph, setGraph] = useState<GroupName>("Z_2");
     const [data, setDataUnsafe] = useState<CayleyGraphData>(cayleyGraphData[graph]); // initially load
-    const l = data.length;
-    const [edges, setEdges] = useState<GraphEdge[][]>(Array(l).fill(0).map((_, i) => [] ));
-    const numEdges = () => {
-        console.log(edges);
-        return edges.reduce((acc, val) => acc + val.filter(cell => cell != undefined).length, 0);
-    
-    }
+    const {vertices, edges} = data;
+    const l = data.vertices.length;
+
+    const numEdges = () => edges.length;
     
     const edgeMap = function<T>(f: (e: GraphEdge, i?: number, j?: number) => T): (T | undefined)[][] {
-        return edges.map((row, i) => row.map((cell, j) => cell == undefined ? undefined : f(cell, i, j)));
+        return edges.map(list => list.map(([from, to], index) => f([from, to], from, to)));
     }
-    const setData = (newData: Vector2[]): boolean => {
-        if (newData.length > MAX_SIZE) {
+    const setData = (newData: CayleyGraphData) : boolean => {
+        if (newData.vertices.length > MAX_SIZE) {
             NotificationManager.error("Too many vertices", "Error", 3000000);
             return false;
         }
         setDataUnsafe(newData);
         return true;
     }
-    const [verteInd, setVertexInd] = useState<number>(0);
+    const [vertexInd, setVertexInd] = useState<number>(0);
     
     const ref = useRef<HTMLDivElement>();
     
@@ -62,10 +59,11 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
     const bound = (x: number) => Math.max(min, Math.min(max, x));
     
     const move = (dx: number, dy: number) => {
-        data[verteInd].add(new Vector2(dx, dy));
-        data[verteInd].x = bound(data[verteInd].x);
-        data[verteInd].y = bound(data[verteInd].y);
-        setData(data);
+        if (vertexInd < 0 || vertexInd >= data.vertices.length) return;
+        vertices[vertexInd].add(new Vector2(dx, dy));
+        vertices[vertexInd].x = bound(vertices[vertexInd].x);
+        vertices[vertexInd].y = bound(vertices[vertexInd].y);
+        setData({...data, vertices});
         forceUpdate();
     }
 
@@ -73,19 +71,31 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
 
     const add = () => { 
         
-        const newData = [...data, new Vector2(50, 50)]
+        const newVertices = [...data.vertices, new Vector2(50, 50)]
         
         console.log("added a new vertex", data)
-        setData(newData);
+        setData({...data, vertices: newVertices});
 
-        const newEdges = [...edges, []];
-        setEdges(newEdges);
-
-        setVertexInd(newData.length - 1);
+        setVertexInd(newVertices.length - 1);
     }
     const reset = () => {
-        setData([]);
-        setVertexInd(0);
+        setData({
+            vertices: [],
+            edges: []
+        });
+        setVertexInd(-1);
+    }
+
+    const copy = () => {
+        // copy the current graph to the clipboard
+        const smallData = {
+            // round the values to two decimal placesd
+            vertices: data.vertices.map(v => `!!new Vector2(${Math.round(v.x * 100) / 100}, ${Math.round(v.y * 100) / 100})!!`),
+            edges: data.edges
+        }
+        const quotedText = JSON.stringify(smallData);
+        const copyText = quotedText.replace(/("!!)|(!!")/g, ""); 
+        navigator.clipboard.writeText(copyText);
     }
     const clickHide = function() {
         // reset, make blank
@@ -94,75 +104,75 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
     }
 
     const vertexDrag = function(i: number) {
-        if (i < 0 || i >= data.length) return;
+        if (i < 0 || i >= vertices.length) return;
         setDraggedIndex(i);
     }
     const addEdge = function(i: number,j: number) {
+        const index = edges.findIndex(([from, to]) => from == i && to == j);
+        if (index != -1) return;
         const newEdges = [...edges];
-        newEdges[i][j] ??= [data[i], data[j]];
-        setEdges(newEdges);
+        newEdges.push([i, j]);
+        setData({...data, edges: newEdges});
     }
     const vertexDrop = function(i: number) {
-        if (i < 0 || i >= data.length) return;
+        if (i < 0 || i >= vertices.length) return;
         setDraggedIndex(i);
         if (draggedIndex == i) return;
         addEdge(draggedIndex, i);
     }
 
     const del = () => {
-        const newData = [...data];
-        newData.splice(verteInd, 1);
-        const success = setData(newData);
-        if (success) setVertexInd(Math.max(verteInd - 1, 0));
+        const newVertices = [...vertices];
+        newVertices.splice(vertexInd, 1);
+        const success = setData({...data, vertices: newVertices});
+        if (success) setVertexInd(Math.max(vertexInd - 1, 0));
     }
 
     const reflectYAxis = () => {
      
-        const length = data.length;
-        const newData = [...data];
+        const length = vertices.length;
+        const newVertices = [...vertices];
         for (let i = 0; i < length; i++) {
-            newData.push(new Vector2(100 - data[i].x, data[i].y));
+            newVertices.push(new Vector2(100 - vertices[i].x, vertices[i].y));
         }
-        const success = setData(newData);
+        const success = setData({...data, vertices: newVertices});
 
-        const newEdges = [...edges, ...new Array(edges.length).fill(0).map((_, i) => [])];
-        setEdges(newEdges);
 
-        if (success) setVertexInd(newData.length - 1);
+        if (success) setVertexInd(newVertices.length - 1);
 
 
     }
     const reflectXAxis = () => {
-   
-        const length = data.length;
-        const newData = [...data];
+     
+        const length = vertices.length;
+        const newVertices = [...vertices];
         for (let i = 0; i < length; i++) {
-            newData.push(new Vector2(data[i].x, 100 - data[i].y));
+            newVertices.push(new Vector2(vertices[i].x, 100 - vertices[i].y));
         }
-        const success = setData(newData);
-        const newEdges = [...edges, ...new Array(edges.length).fill(0).map((_, i) => [])];
-        setEdges(newEdges);
-        
-        if (success) setVertexInd(newData.length - 1);
+        const success = setData({...data, vertices: newVertices});
+
+
+        if (success) setVertexInd(newVertices.length - 1);
+
+
     }
 
     const rotateSpread = (n) => () => {
         // rotate n times with angle 2 pi / n
-        const newData = [...data];
+        const newVertices = [...vertices];
         const center = new Vector2(50, 50);
-        const length = data.length;
+        const length = vertices.length;
         const unit = 2 * Math.PI / n;
         for (let i = 0; i < length; i++) {
-            const v = data[i];
+            const v = vertices[i];
             for (let j = 1; j < n; j++) {
                 const newV = v.clone().rotateAround(center, unit * j);
-                newData.push(newV);
+                newVertices.push(newV);
             }
         }
-        const success = setData(newData);
-        const newEdges = [...edges, ...new Array((n - 1) * edges.length).fill(0).map((_, i) => [])];
-        setEdges(newEdges);
-        if (success) setVertexInd(newData.length - 1);
+        const success = setData({...data, vertices: newVertices});
+
+        if (success) setVertexInd(newVertices.length - 1);
     }
     // a trivial useEffect to rerender the component when the data changes
     const moveLeft = () => move(-5, 0);
@@ -219,16 +229,16 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
                 moveRight();
             break;
             case "[":
-                setVertexInd((verteInd - 1 + data.length) % data.length);
+                setVertexInd((vertexInd - 1 + vertices.length) % vertices.length);
             break;
             case "]":
-                setVertexInd((verteInd - 1 + data.length) % data.length);
+                setVertexInd((vertexInd - 1 + vertices.length) % vertices.length);
             break;
             case "n":
                 add();
                 break;
             case "x":
-                setData(data.filter((_, i) => i != verteInd));
+                setData({...data, vertices: vertices.filter((_, i) => i != vertexInd)});
                 break;
             default:
               console.log("Invalid direction");
@@ -238,10 +248,10 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         }
         
 
-        const currentVertex = data?.[verteInd];
+        const currentVertex = data?.[vertexInd];
         // Detect overlapping vertices for the entire set of vertices, forming an array of clusters
-    const clusters = data.map((pos, i) => {
-        const cluster = data.filter((_, j) => i < j && pos.distanceTo(data[j]) < CLUSTER_THRESHOLD);
+    const clusters = vertices.map((pos, i) => {
+        const cluster = vertices.filter((_, j) => i < j && pos.distanceTo(vertices[j]) < CLUSTER_THRESHOLD);
         return [pos, ...cluster];
     });
     
@@ -279,7 +289,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
             <div style={{width: "100%"}}>
                 <div style={{display: "flex", flexDirection: "column"}}>
                     <span className="CayleyGraphEditor__vertexAndEdgeCount">
-                        Vertices: {data.length} Edges: {numEdges()}
+                        Vertices: {vertices.length} Edges: {numEdges()}
                     </span>
                     <SelectorComponent name={"mode"} options={["Move", "Delete", "Arrow"]} selected={[mode]} mode={"PickOne"} set={arr => setMode(arr[0])} /> 
                     <section style={{
@@ -302,13 +312,13 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
                 </div>
             </div>
             <div className="CayleyGraphEditor__body" ref={ref}>
-                <div className="CayleyGraphEditor__grid"  style={{height: "100%", border: "1px solid black"}}>
-                    <StaticGraph graphEdges={edges} />
-                    {data.map((pos, i) => {
+                <div className="CayleyGraphEditor__grid" >
+                    <StaticGraph edges={edges} vertices={vertices} />
+                    {vertices.map((pos, i) => {
                         const mainWidth: number = ref.current?.offsetWidth ?? 0;
                         const y = mainWidth / 100 * pos.y;
                         const x = mainWidth / 100 * pos.x;
-                        let background = (i == verteInd) ? "#3c5" : "#aaa";
+                        let background = (i == vertexInd) ? "#3c5" : "#aaa";
                         // Log whether arrow mode (with enthusiasm) or a different mode (in a sad tone)
                         if (mode === "Arrow") console.log("Arrow mode");
                         else console.log("Not arrow mode");
@@ -318,16 +328,16 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
                                 draggable={mode === "Arrow"} 
                                 onDragStart={(e) =>{ vertexDrag(i) }} 
                                 onDragOver={(e) => { e.preventDefault(); }}
-                                onDrop={(e) => {  e.preventDefault();vertexDrop(i)}} style={{marginTop: `${ -VERTEX_RADIUS}px`, marginLeft: "-8px", color: "lightgray"}}>{i}</div>
+                                onDrop={(e) => {  e.preventDefault();vertexDrop(i)}} style={{marginTop: `${ -VERTEX_RADIUS - 2}px`, marginLeft: `${ -VERTEX_RADIUS}px`, color: "#aaa", fontSize: `${2*VERTEX_RADIUS}px`}}>{i}</div>
                             </div>
                         )
                     })}
                     {filteredClusters.map((cluster, i) => {
                         const mainWidth: number = ref.current?.offsetWidth ?? 0;
                         const y = mainWidth / 100 * cluster[0].y;
-                        const x = mainWidth / 100 * cluster[0].x;
+                        const x = mainWidth / 100 * cluster[0].x
                         return (
-                            <div style={{ position: "absolute", top: y - 22, left: x + 12, width: "10px", height: "10px"}}>{"" + cluster.length}</div>
+                            <div style={{ position: "absolute", top: y - 20, left: x + 2, width: "5px", height: "5px"}}>{"" + cluster.length}</div>
                         )
                     })}
 
@@ -335,7 +345,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         
                 <div className="CayleyGraphEditor__lower"  style={{border: "1px solid black", height: "20px"}}>
                     <button onClick={reset}>Reset</button>
-                    <button>Generate</button>
+                    <button onClick={copy}>Copy</button>
                 </div>
             </div>
             </div>

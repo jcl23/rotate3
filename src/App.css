@@ -197,7 +197,6 @@ foreignObject span > div {
   left: 50%;
   transform: translate(-50%, -50%);
   min-width:  400px;
-  height: 80vh;
   background: white;
   border: 1px solid black;
   z-index: 1;
@@ -212,18 +211,20 @@ foreignObject span > div {
   }
 
   .CayleyGraphEditor__body {
-    width: calc(100% - 60px);
-    position: absolute;
+    
+    
     
     border: 1px solid black;
     max-width: 500px;
-    margin: 0 auto;
-    aspect-ratio: 1;
   }
   
   .CayleyGraphEditor__grid {
     background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
     background-size: 10% 10%;
+
+    width: 100px;
+    aspect-ratio: 1;
+   
 
   }
 
