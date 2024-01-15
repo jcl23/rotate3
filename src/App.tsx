@@ -98,11 +98,17 @@ function App() {
   const subgroupName = subgroupClass.name;
   console.log("subgroupName: ", subgroupName)
   const { vertices, edges } = cayleyGraphData[subgroupName];
-  const generators = subgroupClass.members[subgroupChoiceIndex].generators.map(
-    (ind) => currentMonoid.values[ind]
-  );
 
-  const subgroupMonoid = makeSubmonoid(currentMonoid, generators);
+  const inclusionMap: Record<number, number> = {}; // of the subgroup into the main group
+  const subgroupGeneratorIndices = subgroupClass.generators;  
+  for (let i = 0; i < subgroupGeneratorIndices.length; i++) {
+    inclusionMap[subgroupGeneratorIndices[i]] =  subgroupClass.members[subgroupChoiceIndex].generators[i];
+  }
+  const inclusion = (i: number) => inclusionMap[i] ?? 0;
+const generators = subgroupGeneratorIndices.map((i) => currentMonoid.values[i]);
+
+
+
   /* Main app navigation */
 
   /* Navigation */
@@ -127,7 +133,7 @@ function App() {
           marginTop: "50px",
         }}
       >
-        <div style={{ width: "50%" }}>
+        <div style={{ width: "33%" }}>
           <button onClick={() => setShowCGEditor(true)}>
             Cayley Graph Editor
           </button>
@@ -174,6 +180,7 @@ function App() {
             generators={
               controlVals.useAllValues ? currentMonoid.values : generators
             } /* determined by the point in the subgroup diagram*/
+            inclusion={inclusion}
             updateHash={""}
             subgroup={subgroupChoiceIndex + "," + subgroupClassIndex}
             monoidValue={monoidValue}
@@ -190,7 +197,7 @@ function App() {
 
           
         </div>
-        <div style={{ width: "50%" }}>
+        <div style={{ width: "33%" }}>
           <div className="SubgroupDiagram__holder">
             <SubgroupDiagramComponent
               size={10}
@@ -219,7 +226,10 @@ function App() {
               <span style={{ flexGrow: 1 }}>{currentMonoid.values.length}</span>
             </p>
           </div>
-        <CayleyGraph
+        </div>
+        <div style={{ width: "33%" }}>
+          
+          <CayleyGraph
             vertices={vertices}
             edges={edges}
             transform={monoidValue}
