@@ -17,10 +17,12 @@ export const MainSelector = function ({
   geometryData, subgroupClassData, subgroupChoiceData
 }: MainSelectorProps) {
   return (
-    <div className="MainSelector__outer">
-      <SelectorComponent {...geometryData} />
+    <div className="SelectorPanel">
+    <div className="SelectorGroup">
+    <SelectorComponent {...geometryData} />
       <SelectorComponent {...subgroupClassData} />
       <SelectorComponent {...subgroupChoiceData} />
+    </div>
     </div>
   )
 };

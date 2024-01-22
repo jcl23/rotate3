@@ -28,6 +28,7 @@ export const SolidMonoids = {
   Dodecahedron: dodMonoid,
 };
 
-export const monoids: Partial<Record<GroupName, IndexedFGM<any>>> = {
+
+export const monoids: Partial<Record<GroupName, IndexedFGM<number>>> = {
   
 }

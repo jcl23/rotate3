@@ -35,9 +35,9 @@ Cube: [
         }]
     },
     // 3
-    { name: "Z_2^2",generators: [1, 2],  members:
+    { name: "K_4",generators: [1, 2],  members:
         [{
-            name: "", generators: [17, 19]
+            name: "", generators: [17, 8]
         },
         {
             name: "", generators: [19, 20]
@@ -46,7 +46,7 @@ Cube: [
         }]
     },
     // 4,
-    { name: "Z_2^2", generators: [1, 2], members:
+    { name: "K_4", generators: [1, 2], members:
         [{
             name: "Fix Y-Faces", generators: [12, 8]
         },{
@@ -77,14 +77,14 @@ Cube: [
         ]
     },
     // 7,
-    { name: "S_3", generators: [], members:
-        [ { name: "Fix Axis 1", generators: [1, 2] },
+    { name: "S_3", generators: [1, 2], members:
+        [ { name: "Fix Axis 1", generators: [6, 7] },
         { name: "Fix Axis 2", generators: [2, 3] },
         { name: "Fix Axis 3", generators: [3, 4] },
         { name: "Fix Axis 4", generators: [4, 1] }]
     },
     // 8,
-    { name: "D_4", generators: [], members:
+    { name: "D_4", generators: [1, 2], members:
         [{
             name: "Dihedral group for Y faces", generators: [5, 8]
         },
@@ -100,8 +100,8 @@ Cube: [
         [{ name: "Axis Rotations", generators: [1, 2, 3, 4] },]
     },
     // 10,
-    { name: "S_4", generators: [], members:
-        [{ name: "All Rotations", generators: [1, 2, 5]}],
+    { name: "S_4", generators: [1, 2], members:
+        [{ name: "All Rotations", generators: [5, 1]}],
     
     },
 ],

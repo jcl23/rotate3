@@ -32,8 +32,9 @@ import {
   Vector3,
 } from "three";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
+import defaultSpringConfig from "./cfg/springs";
 
-import { Transform } from "./Display";
+
 
 import { defaultColors, defaultShapes } from "./DefaultMeshes";
 
@@ -59,11 +60,7 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
     from: { t: 0 },
     to: { t: 1 },
     reset: true,
-    config: {
-      easing: easings.easeInOutCirc,
-      clamp: true,
-      duration: 500,
-    },
+    config: defaultSpringConfig,
   });
   // useFrame to update the rotation value
   useFrame((state, delta) => {

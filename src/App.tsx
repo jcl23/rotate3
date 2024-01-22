@@ -20,6 +20,7 @@ import { SubgroupDiagramComponent } from "./cfg/SubgroupDiagram.tsx";
 import { CayleyGraph } from "./CayleyGraph.tsx";
 
 import subgroupData, { Subgroup } from "./data/subgroupData";
+import groupData from "./data/groupData.ts";
 import { MathComponent } from "mathjax-react";
 import { SubgroupChoice } from "./ui/SubgroupChoice.tsx";
 
@@ -29,7 +30,7 @@ import { GeometryName } from "./DefaultMeshes.tsx";
 import { CayleyGraphEditor } from "./ui/CayleyGraphEditor.tsx";
 import { makeEdges } from "./Edges.ts";
 import { cayleyGraphData } from "./data/cayleyGraphData.ts";
-
+import projectMonoid from "./monoid/projectMonoid.ts";
 function App() {
   const [showCGEditor, setShowCGEditor] = useState(false);
   const [cameraType, setCameraType] = useState<CameraType>("front-facing");
@@ -39,6 +40,7 @@ function App() {
     useAllValues: false,
     showSubgroupIndices: false,
     reindexForSubgroup: false,
+    showCayleyGraph: true,
   });
   // const { geomName }  = controlVals;
   // geomName: {
@@ -47,44 +49,31 @@ function App() {
 
   // Cube | Icosahedron | Dodecahedron | Tetrahedron | Octahedron
   const [geomName, setGeomName] = useState<GeometryName>("Cube");
+  const currentMonoid = SolidMonoids[geomName];
 
   // Which isomorphism class of subgroups to show
-  const [subgroupClassIndex, setSubgroupClassIndex] = useState(0);
+  const [subgroupClassIndex, setSubgroupClassIndex] = useState(1);
   // which conjugacy class of subgroups to show
   const [subgroupChoiceIndex, setSubgroupChoiceIndex] = useState(0);
 
-  
-  const currentMonoid = SolidMonoids[geomName];
   const [monoidValue, setMonoidValue] = useState(currentMonoid.identity);
+
   const currentSubgroupDiagramData = subgroupDiagramData[geomName];
 
-
-
-  useLayoutEffect(() => {
-    console.log("[App - useLayoutEffect] geomName: ", geomName);
-    // setCurrentMonoid(SolidMonoids[geomName]);
-    setSubgroupClassIndex(0);
-    setSubgroupChoiceIndex(0);
+  if (monoidValue.index > currentMonoid.elements.length) {
     setMonoidValue(currentMonoid.identity);
-  }, [geomName]);
-
-  useLayoutEffect(() => {
-  // reset the monoid if the current value isn't in the new monoid
-    if (!currentMonoid.values.includes(monoidValue)) {
-      setMonoidValue(currentMonoid.identity);
-    }
-  }, [subgroupClassIndex, subgroupChoiceIndex]);
+  }
 
   const subgroupClass = subgroupData[geomName]?.[subgroupClassIndex];
   if (subgroupClass == undefined)
     throw new Error(
       `subgroupClass = subgroupData[${geomName}]?.[${subgroupClassIndex}] is undefined for ${geomName} at index ${subgroupClassIndex}`
     );
-    if (subgroupClass?.members?.[subgroupChoiceIndex] == undefined) {
-      throw new Error(
-        `subgroupData[${geomName}][${subgroupClassIndex}].members[${subgroupChoiceIndex}] is undefined`
-      );
-    }
+  if (subgroupClass?.members?.[subgroupChoiceIndex] == undefined) {
+    throw new Error(
+      `subgroupData[${geomName}][${subgroupClassIndex}].members[${subgroupChoiceIndex}] is undefined`
+    );
+  }
   if (subgroupClass.members[subgroupChoiceIndex]?.generators == undefined)
     throw new Error(
       `subgroupClass[${subgroupChoiceIndex}].generators is undefined for ${geomName} at index ${subgroupClassIndex}`
@@ -95,20 +84,36 @@ function App() {
       `subgroupClass.generators is undefined for ${geomName} at index ${subgroupClassIndex}`
     );
 
+  useLayoutEffect(() => {
+    // When the geometry changes, reset the subgroup class and choice indices, and the monoid value
+    setSubgroupClassIndex(1);
+    setSubgroupChoiceIndex(0);
+    setMonoidValue(currentMonoid.identity);
+  }, [geomName]);
   const subgroupName = subgroupClass.name;
-  console.log("subgroupName: ", subgroupName)
-  const { vertices, edges } = cayleyGraphData[subgroupName];
+  console.log("subgroupName: ", subgroupName);
+  
+  const data = cayleyGraphData[subgroupName];
+  const vertices = data ? data?.vertices : [];
+  const edges = data ? data?.edges : [];
 
-  const inclusionMap: Record<number, number> = {}; // of the subgroup into the main group
-  const subgroupGeneratorIndices = subgroupClass.generators;  
-  for (let i = 0; i < subgroupGeneratorIndices.length; i++) {
-    inclusionMap[subgroupGeneratorIndices[i]] =  subgroupClass.members[subgroupChoiceIndex].generators[i];
+  const embeddedGeneratorIndices =
+    subgroupClass.members[subgroupChoiceIndex].generators;
+  const generators = embeddedGeneratorIndices.map(index => currentMonoid.elements[index]);
+  const subgroup = groupData[subgroupName];
+  if (subgroup == undefined) {
+    throw new Error(`groupData[${subgroupName}] is undefined`);
   }
-  const inclusion = (i: number) => inclusionMap[i] ?? 0;
-const generators = subgroupGeneratorIndices.map((i) => currentMonoid.values[i]);
+  const projection = projectMonoid(currentMonoid, generators, subgroup);
+  //const submonoid = makeSubmonoid(currentMonoid, generators);
+  //console.log({submonoid})
+  //const projectionMap: Record<number, number> = { 0: 0 }; // of the group onto the subgroup
+  const subgroupOwnGeneratorIndices = subgroupClass.generators;
 
+  //const projection = (i: number) => projectionMap[i] ?? 0;
 
-
+  // const submonoid = makeSubmonoid(currentMonoid, subgroupGenerators);
+  // console.log("Submonoid:", submonoid);
   /* Main app navigation */
 
   /* Navigation */
@@ -118,7 +123,10 @@ const generators = subgroupGeneratorIndices.map((i) => currentMonoid.values[i]);
   const setClassAndResetChoice = function (classIndex: number) {
     setSubgroupClassIndex(classIndex);
     setSubgroupChoiceIndex(0);
+    setMonoidValue(currentMonoid.identity);
   };
+
+  const elementsToDisplay = controlVals.useAllValues ? currentMonoid.elements : generators;
   return (
     <div
       className="App"
@@ -137,50 +145,52 @@ const generators = subgroupGeneratorIndices.map((i) => currentMonoid.values[i]);
           <button onClick={() => setShowCGEditor(true)}>
             Cayley Graph Editor
           </button>
+          <button onClick={() => {localStorage.removeItem("cayleygraph")}}>Reset Cayley</button>
           <CayleyGraphEditor
             show={showCGEditor}
             hide={() => setShowCGEditor(false)}
           />
-          <MainSelector
-            geometryData={{
-              name: "Geometry",
-              options: [
-                "Cube",
-                "Icosahedron",
-                "Dodecahedron",
-                "Tetrahedron",
-                "Octahedron",
-              ],
-              selected: [geomName],
-              set: (vals) => setGeomName(vals[0]),
-              mode: "PickOne",
-            }}
-            subgroupClassData={{
-              name: "Subgroup",
-              options: subgroupClass.members.map((val: Subgroup) => val.name),
-              selected: [],
-              set: function (value: SetStateAction<string[]>): void {
-                throw new Error("Function not implemented.");
-              },
-              mode: "PickOne",
-            }}
-            subgroupChoiceData={{
-              name: "Conjgacy Class",
-              options: [],
-              selected: [],
-              set: function (value: SetStateAction<string[]>): void {
-                throw new Error("Function not implemented.");
-              },
-              mode: "PickOne",
-            }}
-          />
+          {!showCGEditor && (
+            <MainSelector
+              geometryData={{
+                name: "Geometry",
+                options: [
+                  "Cube",
+                  "Icosahedron",
+                  "Dodecahedron",
+                  "Tetrahedron",
+                  "Octahedron",
+                ],
+                selected: [geomName],
+                set: (vals) => setGeomName(vals[0]),
+                mode: "PickOne",
+              }}
+              subgroupClassData={{
+                name: "Subgroup",
+                options: subgroupClass.members.map((val: Subgroup) => val.name),
+                selected: [],
+                set: function (value: SetStateAction<string[]>): void {
+                  throw new Error("Function not implemented.");
+                },
+                mode: "PickOne",
+              }}
+              subgroupChoiceData={{
+                name: "Conjgacy Class",
+                options: [],
+                selected: [],
+                set: function (value: SetStateAction<string[]>): void {
+                  throw new Error("Function not implemented.");
+                },
+                mode: "PickOne",
+              }}
+            />
+          )}
           <FGIMonoidDisplay<E3>
             shape={geomName}
             monoid={currentMonoid}
             generators={
-              controlVals.useAllValues ? currentMonoid.values : generators
+              elementsToDisplay
             } /* determined by the point in the subgroup diagram*/
-            inclusion={inclusion}
             updateHash={""}
             subgroup={subgroupChoiceIndex + "," + subgroupClassIndex}
             monoidValue={monoidValue}
@@ -192,10 +202,9 @@ const generators = subgroupGeneratorIndices.map((i) => currentMonoid.values[i]);
             cameraType={cameraType}
             transform={monoidValue}
             stepIndex={0}
+            availableTransformations={elementsToDisplay}
           />
           <CameraControls setCameraType={setCameraType} />
-
-          
         </div>
         <div style={{ width: "33%" }}>
           <div className="SubgroupDiagram__holder">
@@ -206,7 +215,7 @@ const generators = subgroupGeneratorIndices.map((i) => currentMonoid.values[i]);
               active={subgroupClassIndex}
               setActive={setClassAndResetChoice}
               labels={currentSubgroupDiagramData.labels.map((val, index) =>
-                controlVals.showSubgroupIndices ? ("" + index) : val
+                controlVals.showSubgroupIndices ? "" + index : val
               )}
             />
             <SubgroupChoice
@@ -223,17 +232,18 @@ const generators = subgroupGeneratorIndices.map((i) => currentMonoid.values[i]);
             <h1>{currentMonoid.name}</h1>
             <p style={{ justifyContent: "space-around", display: "flex" }}>
               <span style={{ flexGrow: 2 }}>Order:</span>
-              <span style={{ flexGrow: 1 }}>{currentMonoid.values.length}</span>
+              <span style={{ flexGrow: 1 }}>{currentMonoid.elements.length}</span>
             </p>
           </div>
         </div>
         <div style={{ width: "33%" }}>
-          
-          <CayleyGraph
-            vertices={vertices}
-            edges={edges}
-            transform={monoidValue}
-          />
+          {( controlVals.showCayleyGraph) && (
+            <CayleyGraph
+              vertices={vertices}
+              edges={edges}
+              currentIndex={projection(monoidValue).index}
+            />
+          )}
         </div>
       </div>
     </div>

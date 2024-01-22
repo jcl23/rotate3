@@ -14,7 +14,7 @@ export type MonoidDisplayProps<T> = {
     shape: keyof typeof defaultShapes;
   updateHash: string;
   subgroup: string;
-  inclusion: (i: number) => number;
+  // inclusion: (i: number) => number;
   monoidValue: Indexed<T>;
   setMonoidValue: SetAction<Indexed<T>>;
 };
@@ -35,7 +35,6 @@ export const FGIMonoidDisplay = function<T> ({
 
   const composeStateWith = (x: Indexed<T>) => {
     const nextValue = multiply(monoidValue, x);
-    const includedValue = 
     setMonoidValue(nextValue);
   }
 

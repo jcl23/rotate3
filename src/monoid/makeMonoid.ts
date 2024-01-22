@@ -45,24 +45,37 @@ export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: num
     }
     const returnMonoid =  indexMonoid(monoid, 0.01);
 
-    console.log(`Monoid for ${geom.type} of size: `, returnMonoid.values.length);
+    console.log(`Monoid for ${geom.type} of size: `, returnMonoid.elements.length);
     return returnMonoid;
 }
 
 export const makeSubmonoid = function<T>(m: IndexedFGM<T>, generators: Indexed<T>[]): IndexedFGM<T> {
-    
-const values: Indexed<T>[] = [];
+    const values: Indexed<T>[] = [m.identity];
     let queue: Indexed<T>[] = [m.identity];
+    let index = 1;
+    let seenIndices =   new Set();
+    seenIndices.add(0);
     while (queue.length) {
         const newQueue: Indexed<T>[] = [];
         let element;
         while (element = queue.shift()) {
-            values.push(element);
+            
             for (const generator of generators) {
                 const newElement = m.multiply(element, generator);
-                let index = values.findIndex((_el) => _el.index == newElement.index);
-                if (index < 0) {
+                if (
+                    newElement.index >= m.elements.length
+                    || newElement.index < 0) {
+                    throw new Error("Index out of bounds");
+                }
+                let presentInValues = seenIndices.has(newElement.index);
+                
+                
+                if (!presentInValues) {
+                    seenIndices.add(newElement.index);
+                    
                     // new element in monoid
+                    values.push({...newElement, index});
+                    index++;
                     newQueue.push(newElement);
                 }
             }
@@ -75,8 +88,8 @@ const values: Indexed<T>[] = [];
         identity: m.identity,
         multiply: m.multiply,
         name: m.name,
-        values
+        elements: values
     }
-    console.log("Generated submonoid of size: ", monoid.values.length, " from ", generators.length, " generators.")
+    console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
      return monoid;
 }

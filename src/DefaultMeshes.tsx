@@ -15,7 +15,7 @@ export const defaultShapes = {
     Dodecahedron: () => new DodecahedronGeometry(0.8).toNonIndexed(),
 }
 export type GeometryName = keyof typeof defaultShapes;  
-export type GroupName = "1" | "Z_2" | "Z_3" | "K_4" | "Z_4" | "Z_5" | "Z_6" | "D_4" | "A_4" | "S_4";
+export type GroupName = "1" | "Z_2" | "Z_3" | "K_4" | "Z_4" | "Z_5" | "Z_6" | "D_4" | "S_3" | "A_4" | "S_4";
 
 
 export const defaultColors = {

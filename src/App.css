@@ -12,6 +12,9 @@ button {
   --button-inactive: rgb(59, 55, 55);
   --button-active: rgb(231, 82, 56);
   --accent-dark: rgb(0, 0, 0);
+
+  --BACKGROUND1: rgb(180,180,180);
+  --BACKGROUND2: #cccccc;
 }
 
 #root {
@@ -81,9 +84,39 @@ html, body {
 }
 
 .MainSelector_inner {
-
+   position: absolute;
+   top: 0;
+   left: 0;
+   display: flex;
+   flex-direction: row;
 }
 
+.SelectorPanel {
+  flex-direction: row;
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.SelectorGroup {
+  position: relative;
+  width: min-content;
+  padding: 20px;
+  top: 0;
+  background: #ffffff60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.MainSelector__outer {
+  
+  z-index: 0;
+
+}
 .MainSelector_button {
   border-radius: 1px;
 }
@@ -94,6 +127,12 @@ html, body {
 }
 .SubgroupDiagram div:active {
 
+}
+
+.SelectorComponent__outer {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
 }
 foreignObject > div {
   margin: 0 auto;
@@ -133,6 +172,10 @@ foreignObject span > div {
   width: 400px;
   height: 306px;
   border: 1px solid red;
+}
+
+.CayleyGraph svg {
+  background: var(--BACKGROUND2);
 }
 
 .SubgroupDiagram__holder {
@@ -189,6 +232,7 @@ foreignObject span > div {
   height: 100%;
   background: #ffffffaa;
   overflow: hidden;
+  z-index: 1;
   }
   
   .CayleyGraphEditor__outer {
@@ -199,7 +243,7 @@ foreignObject span > div {
   min-width:  400px;
   background: white;
   border: 1px solid black;
-  z-index: 1;
+  z-index: 10;
   padding: 30px;
   }
   
@@ -211,10 +255,10 @@ foreignObject span > div {
   }
 
   .CayleyGraphEditor__body {
-    
-    
+     
     
     border: 1px solid black;
+    background: var(--BACKGROUND1);
     max-width: 500px;
   }
   
@@ -222,10 +266,15 @@ foreignObject span > div {
     background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
     background-size: 10% 10%;
 
-    width: 100px;
+    width: 100%;
     aspect-ratio: 1;
    
 
+  }
+
+  .CayleyGraphEditor__grid svg {
+    width: 100%;
+    height: 100%;
   }
 
   .CayleyGraphEditor__lower {
@@ -254,4 +303,9 @@ foreignObject span > div {
 
   .notification-container {
     
+  }
+
+  .CayleyGraph > * {
+    grid-row-start: 1;
+    grid-column-start: 1;
   }

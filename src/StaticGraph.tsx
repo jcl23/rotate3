@@ -8,36 +8,21 @@ import {
 } from "three";
 import { CayleyGraphData, CayleyGraphEdges } from "./CayleyGraph";
 import { GEN_COLORS } from "./cfg/colors";
+import React, { SVGProps } from "react";
+import { timerDelta } from "three/examples/jsm/nodes/Nodes.js";
 
-import { i_edge } from "./ui/CayleyGraphEditor";
-
-
-const DEPTH = 0.01;
-
-function edgesToCylinders(edgesGeometry, thickness) {
-  const { position } = edgesGeometry.attributes;
-  const { array, count } = position;
-  const r = thickness / 2;
-  const geoms = [];
-  for (let i = 0; i < count * 3 - 1; i += 6) {
-    const a = new Vector3(array[i], array[i + 1], array[i + 2]);
-    const b = new Vector3(array[i + 3], array[i + 4], array[i + 5]);
-
-    const vec = new Vector3().subVectors(b, a);
-    const len = vec.length();
-    const geom = new CylinderGeometry(r, r, len, 8);
-    geom.translate(0, len / 2, 0);
-    geom.rotateX(Math.PI / 2);
-    geom.lookAt(vec);
-    geom.translate(a.x, a.y, a.z);
-    geoms.push(geom);
-  }
+type StaticGraphProps = {
+  graphData: CayleyGraphData;
+  textAttributes?: Record<string, any>;
 }
 
-export const StaticGraph = function ({ edges, vertices }: CayleyGraphData) {
-  const toLine = ([from, to]: [Vector3, Vector3], color: Color) => {
+export const StaticGraph = function ({graphData: { edges, vertices }, textAttributes = {} }: StaticGraphProps) {
+  if (vertices === undefined) {
+    throw new Error("[StaticGraph] vertices is undefined");
+  }
+  const toLine = ([from, to]: [Vector3, Vector3], color: string) => {
     if (color === undefined) {
-      throw new Error("color is undefined");
+      throw new Error("[StaticGraph] color is undefined");
     }
     const div = document.createElement("div");
     const length = from.distanceTo(to);
@@ -49,12 +34,20 @@ export const StaticGraph = function ({ edges, vertices }: CayleyGraphData) {
     const width = (to.x - from.x);
     const height = (to.y - from.y);
     // convert this to react style element 
+    
+    const arrowPosition = 0.4;
+    const cx = from.x * arrowPosition + to.x * (1 - arrowPosition);
+    const cy = from.y * arrowPosition + to.y * (1 - arrowPosition);
+    return <polyline markerMid="url(#triangle)" points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`} stroke={color} strokeWidth={3} />;
+    
+    
     return <div style={{
-      transform: `translate(${-width / 2 + x}px, ${height / 2 + y}px) rotate(${angle}rad)`,
-      width: `${length}px`,
+      // transform: `translate(${-width / 2 + x}px, ${height / 2 + y}px) rotate(${angle}rad)`,
+      width: `${length / 2}%`,
       height: `${3}px`,
       background: color.getStyle(),
-      position: "absolute",
+      position: "relative",
+      marginTop: 0,
       zIndex: "100",
       borderRadius: "3px",
       transformOrigin: "left"
@@ -65,13 +58,37 @@ export const StaticGraph = function ({ edges, vertices }: CayleyGraphData) {
   };
 
 
-  const listToReturn = edges.map((list, listIndex) => list.map(([i, j], edgeIndex) => {
-    const [p1, p2] = i_edge ([vertices[i], vertices[j]]);
-    return toLine([p1, p2], GEN_COLORS[listIndex % GEN_COLORS.length]);
+  const listToReturn = edges.map((list, listIndex) => list.map(([i, j]) => {
+    let p1: Vector3, p2: Vector3;
+    try {
+      p1 = new Vector3(vertices[i].x, vertices[i].y, 0);
+      p2 = new Vector3(vertices[j].x, vertices[j].y, 0);
+    } catch (e) {
+      throw new Error(`[StaticGraph] vertices[${i}] or vertices[${j}] is undefined, where vertices has length ${vertices.length}: `);
+    }
+    return (
+      <React.Fragment key={`StaticGraph__edge[${i}][${j}]`}>
+        {toLine([p1, p2], GEN_COLORS[listIndex % GEN_COLORS.length])}
+      </React.Fragment>
+    )
   })).flat(1);
   return (
     <>
       {listToReturn}
+      {vertices.map((v, i) => {
+                    return (
+                        <g key={`StaticGraph__vertex[${i}]`}>
+                            <circle
+                                key={`CayleyGraph_circle#${i}`}
+                                cx={v.x / 2 + "%"}
+                                cy={v.y / 2 + "%"}
+                                r={"1.5%"}
+                                color="black"
+                            />
+                            <text x={v.x + 3} y={v.y + 2} {...textAttributes}>{i}</text>
+                        </g>
+                            )
+                })}
       </>
   );
 };
