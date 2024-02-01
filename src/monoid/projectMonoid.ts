@@ -17,6 +17,10 @@ export default function<T>(G: IndexedFGM<T>, newGenerators: Indexed<T>[], H: Ind
 
     const includedValues = enumerateTransforms<Indexed<T>>(subG);
     const map: Record<number, number> = {};
+    if (H.elements == undefined) {
+        debugger;
+        throw new Error("H.elements is undefined");
+    }
     if (includedValues.length !== H.elements.length) {
         throw new Error("Groups must have the same number of elements");
     }

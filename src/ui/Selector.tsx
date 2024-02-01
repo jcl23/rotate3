@@ -7,7 +7,7 @@ export type SelectorData<T> = {
     selected: T[] | number[],
     mode: "PickOne" | "PickMany" | "Index",
     useIndices?: boolean
-    set: React.Dispatch<React.SetStateAction<T[]>>,
+    set: React.Dispatch<React.SetStateAction<T[] & number>>,
     outerProps?: HTMLProps<HTMLDivElement>,
 }
 
@@ -38,7 +38,7 @@ export function SelectorComponent<T extends { toString: () => string } | number>
     }
     if (mode == "Index") {
         elements = options.map((option, i) => (
-            <button onClick={() => set([option])} key={`SelectorComponent_option#${i}`}>{useIndices ? i : option}</button>
+            <button onClick={() => set(i)} key={`SelectorComponent_option#${i}`}>{useIndices ? i : option}</button>
         ));
     }
     if (mode == "Action") {

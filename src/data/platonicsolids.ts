@@ -24,10 +24,16 @@ export const SolidMonoids = {
   Cube: cubeMonoid,
   Icosahedron: icoMonoid,
   Tetrahedron: tetraMonoid,
-  Octahedron: octaMonoid,
-  Dodecahedron: dodMonoid,
+  Octahedron: cubeMonoid,
+  Dodecahedron: icoMonoid,
+  // Octahedron: octaMonoid,
+  // Dodecahedron: dodMonoid,
 };
-
+SolidMonoids.Cube.name = "S_4";
+SolidMonoids.Octahedron.name = "S_4";
+SolidMonoids.Tetrahedron.name = "A_4";
+SolidMonoids.Icosahedron.name = "A_5";
+SolidMonoids.Dodecahedron.name = "A_5";
 
 export const monoids: Partial<Record<GroupName, IndexedFGM<number>>> = {
   

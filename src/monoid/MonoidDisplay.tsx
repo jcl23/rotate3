@@ -2,12 +2,14 @@ import {useEffect, useMemo, useState } from "react";
 import React from "react";
 import { Indexed, IndexedMonoid } from "./IndexedMonoid";
 import { defaultShapes } from "../DefaultMeshes";
+import { GEN_COLORS } from "../cfg/colors";
 
 
 
 export type SetAction<T> = React.Dispatch<React.SetStateAction<T>>
 export type MonoidDisplayProps<T> = {
   monoid: IndexedMonoid<T>;
+  availableTransformations: Indexed<T>[];
   generators: Indexed<T>[];
   // children: ReactElement<typeof ShapeDisplay>
   //   | Array<ReactElement<typeof ShapeDisplay>>;
@@ -22,6 +24,7 @@ export type MonoidDisplayProps<T> = {
 export const FGIMonoidDisplay = function<T> ({
   // Responsible for managing 
   monoid,
+  availableTransformations,
   generators,
   monoidValue,
 
@@ -75,19 +78,25 @@ export const FGIMonoidDisplay = function<T> ({
     <div className="MonoidDisplay_outer">
       <div className="MonoidDisplay_buttons">
 
-        {generators.map((generator, i) => (
+        {availableTransformations.map((transform, i) => {
+          const isGenerator = generators.some((generator) => generator.index === transform.index);
+          const style = isGenerator ? {
+            backgroundColor: GEN_COLORS[i % GEN_COLORS.length]
+          } : {};
+          return (
 
-            <button className="generator-button" key={`ShapeDisplay_span#${i}`}
+            <button className={"transform-button"} key={`ShapeDisplay_span#${i}`} style={style}
               onClick={() => {
                 //setRotation(new Quaternion().multiplyQuaternions(generator.rotation, transform.rotation));
-                composeStateWith(generator);
+                composeStateWith(transform);
                 setStepIndex(stepIndex + 1);
                 
               }}
               >
-              {generator.index}
+              {transform.index}
             </button>
-        ))}
+        )
+        })}
     </div>
    
       

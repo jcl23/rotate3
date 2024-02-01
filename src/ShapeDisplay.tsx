@@ -1,4 +1,4 @@
-import { Canvas, } from "@react-three/fiber";
+import { CameraProps, Canvas, } from "@react-three/fiber";
 import { useRef, useState, useEffect, useMemo, useLayoutEffect } from "react";
 import { Quaternion, Vector3,  PerspectiveCamera, Camera, OrthographicCamera, Color, CanvasTexture, UVMapping, RepeatWrapping, PCFSoftShadowMap, BufferGeometry, Line, LineBasicMaterial, ExtrudeGeometry, Vector2, MeshBasicMaterial, Mesh, CylinderGeometry, MeshPhongMaterial } from "three";
 import { MyCamera } from "./Camera";
@@ -9,6 +9,7 @@ import { Step } from "./Shape";
 import { Shape } from "./Shape";
 import { CameraControls, Environment, Lightformer, PerformanceMonitor } from "@react-three/drei";
 import { set } from "firebase/database";
+import { Partial } from "@react-spring/three";
 
 const AXIS_RADIUS = 0.05;
 export type ShapeDisplayProps = {
@@ -17,11 +18,13 @@ export type ShapeDisplayProps = {
     transform: Indexed<E3>;
     stepIndex: number;
     availableTransformations: Indexed<E3>[];
+    generators: Indexed<E3>[];
     cameraType:
       | "front-facing"
       | "perspective"
       | "perspectiveOffset"
       | "orthographic";
+    cameraProps: Partial<CameraProps>;
   };
 // map from a quaternion to a three fiber line, with width, representing the axis of rotation
 export const quaternionToAxis = function(numSegments: number) {
@@ -34,7 +37,9 @@ export const quaternionToAxis = function(numSegments: number) {
    
     const axis = new Vector3(q.x, q.y, q.z).normalize();
     const geometry = new CylinderGeometry(AXIS_RADIUS, AXIS_RADIUS, 5, numSegments);
+    // center the geometry
     geometry.rotateX(Math.PI / 2);
+   // geometry.translate(0, AXIS_RADIUS, 0);
     const material = new MeshPhongMaterial( { color: 0xffffff, reflectivity: 2 } );
     const cylinder = new Mesh(geometry, material);
     cylinder.lookAt(axis);
@@ -47,8 +52,10 @@ export const ShapeDisplay = function ({
     transform: { value: { rotation, position } },
     stepIndex,
     cameraType,
+    
     children,
-    availableTransformations, 
+
+    generators,
   }: ShapeDisplayProps) {
     const shapeRef = useRef();
     
@@ -69,11 +76,11 @@ export const ShapeDisplay = function ({
             camera.position.set(1, 2, 3);
             break;
             case "front-facing":
-            default:
-            camera = new PerspectiveCamera(75, 1, 0.1, 1000);
-            camera.position.set(0, 0, 3);
-            break;
+              camera = new PerspectiveCamera(75, 1, 0.1, 1000);
+              camera.position.set(0, 0, 3);
+              break;
             case "orthographic":
+            default:
             camera = new OrthographicCamera(75, 1, 0.1, 1000);
             camera.position.set(0, 0, 3);
             break;
@@ -101,7 +108,7 @@ export const ShapeDisplay = function ({
             <Shape ref={shapeRef} shape={shape}  transform={transformStep}  />
         </>
       )
-    }, [dummy, transformStep]);
+    }, [shape, dummy, transformStep]);
 
     [transformStep, shape, cameraType].forEach((val) => {
       useEffect(() => {
@@ -162,7 +169,7 @@ export const ShapeDisplay = function ({
 
             }}
             background={new Color("#000")}
-            camera={camera}
+            
             gl={{ 
               antialias:true, 
               powerPreference: "high-performance",
@@ -203,7 +210,7 @@ export const ShapeDisplay = function ({
               {/* below: a spotlight pointing straight down */}
                 
               {stableShape}
-              {availableTransformations.map(({value: {rotation}}) => rotation).map(quaternionToAxis(6), { lineWidth: 4 }).map(data => <primitive object={data} />)}
+              {generators.map(({value: {rotation}}) => rotation).map(quaternionToAxis(6), { lineWidth: 4 }).map((data, i) => <primitive key={`ShapeDisplay_prim[${i}]`} object={data} />)}
               {children}
              
        

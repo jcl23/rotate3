@@ -82,7 +82,7 @@ export const StaticGraph = function ({graphData: { edges, vertices }, textAttrib
                                 key={`CayleyGraph_circle#${i}`}
                                 cx={v.x / 2 + "%"}
                                 cy={v.y / 2 + "%"}
-                                r={"1.5%"}
+                                r={"1%"}
                                 color="black"
                             />
                             <text x={v.x + 3} y={v.y + 2} {...textAttributes}>{i}</text>

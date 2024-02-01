@@ -1,12 +1,12 @@
 import { CayleyGraphProps } from "./CayleyGraph";
 import { GeometryName } from "./DefaultMeshes";
-import subgroupData, { Subgroup } from "./data/subgroupData";
+import subgroupData, { SubgroupData } from "./data/subgroupData";
 import subgroupDiagramData from "./data/subgroupDiagramData";
 
 type SampleData = {
     name: GeometryName,
     cayleyGraph: CayleyGraphProps,
-    subgroups: Subgroup[]
+    subgroups: SubgroupData[]
 }
 export function StatusComponent() {
     

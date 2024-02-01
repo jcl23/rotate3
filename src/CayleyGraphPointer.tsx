@@ -14,7 +14,7 @@ import { animated, useSpring } from "react-spring";
 import defaultSpringConfig from "./cfg/springs";
 
 type CayleyGraphPointerProps = {
-  transform: Step<THREE.Vector3>;
+  transform: Step<{x: number, y: number}>;
 };
 
 function useAnimatedPosition(position: { x: string; y: string }, style: Partial<StyleHTMLAttributes<typeof animated.div>>["style"] = {}) {

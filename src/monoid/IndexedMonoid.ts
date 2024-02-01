@@ -1,25 +1,27 @@
-import { Transform } from "../Display";
+
 import { Monoid } from "./Monoid";
 import { makeCayleyTable } from "../logic/cayleyTables";
-import { Quaternion } from "three";
-import { FinExpMonoid } from "../data/groupData";
+
 
 export type Indexed<T> = {index: number, value: T};
-export type IndexedMonoid<T> = Monoid<Indexed<T>>;   
-
-
+type IndexedMonoid<T> = Monoid<Indexed<T>> & {
+    cayleyTable?: Indexed<T>[][];
+    elements: Indexed<T>[];
+};   
 
 export interface FinitelyGeneratedMonoid<T> extends Monoid<T> {
     generators: T[];
     // values: Transform[];
 }
-export interface IndexedFGM<T> extends IndexedMonoid<T> {
-    generators: Indexed<T>[];
-    elements: Indexed<T>[];
-    cayleyTable?: Indexed<T>[][];
-    // extraRotations?: Quaternion[];
-}
 
+export interface FiniteMonoid<T> extends FinitelyGeneratedMonoid<T> {
+    elements: T[];
+}
+export type IndexedFGM<T> = FinitelyGeneratedMonoid<Indexed<T>> & IndexedMonoid<T>
+
+
+
+export type IndexedFM<T> = FiniteMonoid<Indexed<T>> & IndexedFGM<T>;
 export type IndexedFinExpMonoid<T> = IndexedFGM<T> & {
     orderOf: (element: Indexed<T>) => number;
 }
@@ -27,7 +29,7 @@ export type IndexedFinExpMonoid<T> = IndexedFGM<T> & {
 
 
 
-export const indexMonoid = function<T>(monoid: FinExpMonoid<T>, delta = 0.01): IndexedFinExpMonoid<T> {
+export const indexMonoid = function<T>(monoid: FinitelyGeneratedMonoid<T>, delta = 0.01, maxSize = 1000): IndexedFM<T> {
     let identity = { index: 0, value: monoid.identity };
     
     
@@ -53,7 +55,7 @@ export const indexMonoid = function<T>(monoid: FinExpMonoid<T>, delta = 0.01): I
         if ( index >= values.length || index < 0) {
             throw new Error("Index out of bounds");
         }
-        if (value == undefined) {
+        if (value === undefined) {
             throw new Error("Index out of bounds"); 
         }
         return { index, value };
@@ -64,13 +66,14 @@ export const indexMonoid = function<T>(monoid: FinExpMonoid<T>, delta = 0.01): I
     const generators = values.slice(1, 1 + monoid.generators.length);
     
     return {
+        ...monoid,
         identity,
         multiply,
         generators,
         elements: values,
         name: monoid.name,
         cayleyTable,
-        orderOf: (element: Indexed<T>) => monoid.orderOf(element.value),
+        compare: (x, y) => x.index - y.index,
     }
     
 };

@@ -10,7 +10,8 @@ button {
 
 :root {
   --button-inactive: rgb(59, 55, 55);
-  --button-active: rgb(231, 82, 56);
+  --button-halfactive: rgb(161, 73, 57);
+  --button-active: rgb(245, 202, 146);
   --accent-dark: rgb(0, 0, 0);
 
   --BACKGROUND1: rgb(180,180,180);
@@ -193,12 +194,15 @@ foreignObject span > div {
   height: 50px; display: flex; overflow-x: scroll;
 }
 
-.generator-button {
+.transform-button {
   display: inline-flex;
   margin: 0 auto;
   flex-basis: 100%;
   justify-content: center;
   padding: 10px;
+}
+.generator-button {
+  background-color: #aacc44
 }
 
 .SubgroupChoice__outer {
@@ -309,3 +313,43 @@ foreignObject span > div {
     grid-row-start: 1;
     grid-column-start: 1;
   }
+
+  .CayleyPanel__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(25px, 35px));
+    gap: 2px; /* Adjust the gap as needed */
+    max-width: 200px;
+  }
+
+  
+  .CayleyPanel__grid button {
+    border-width: 1px;
+  }
+
+  .CayleyPanel__grid > button:last-child {
+    grid-column: span auto; /* Make the last button extend to the end */
+  }
+
+  .highlighted {
+    background: var(--button-active);
+  }
+  .highlighted2 {
+    background: var(--button-halfactive);
+  }
+  .inactive {
+    background: #555;
+  }
+
+  button {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add box shadow for a skeuomorphic look */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Add transition for smoother hover effect */
+  }
+
+button:hover {
+  background-color:var(--button-active); /* Change background color on hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Adjust box shadow on hover for depth effect */
+}
+
+.grid-item:last-child {
+  grid-column: span 2; /* Make the last button extend to the end */
+}

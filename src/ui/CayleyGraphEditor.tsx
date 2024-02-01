@@ -12,12 +12,15 @@ import { CayleyGraphData, CayleyGraphVertex } from "../CayleyGraph";
 import { GeneratorSelector } from "./GeneratorSelector";
 import { validateCayleyGraph, determineGeneratorOrder, getElementOrder  } from "../logic/cayleyLogic";
 
-import { GroupName } from "../DefaultMeshes";
+import { GeometryName, GroupName } from "../DefaultMeshes";
 import groupData from "../data/groupData";
 
 import { IndexedFGM } from "../monoid/IndexedMonoid";
 import { GraphMatchingSelector } from "./GraphMatchingSelector";
 import { set } from "firebase/database";
+import { SolidMonoids } from "../data/platonicsolids";
+import { cayleyGraphData } from "../data/cayleyGraphData";
+import subgroupsData from "../data/subgroupData";
 
 //cayleygraphdata type
 
@@ -48,8 +51,14 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
     const [numGenerators, setNumGenerators] = useState<number>(0);
     const [currentGeneratorIndex, setCurrentGeneratorIndex] = useState<number>(0);
     // Group Data
+    const [geomName, setGeomName] = useState<GeometryName>("Cube");
+    const transformationGroup = SolidMonoids[geomName];
     const [groupName, setChosenGroup] = useState<GroupName>("1");
-    const group = groupData[groupName];
+    // const [subgroupName, setChosenSubgroup] = useState<GroupName>("1");
+    const group = groupData["S_4"];
+    if (group === undefined) {
+        throw new Error(`[CayleyGraphEditor] Group ${groupName} is undefined`);
+    }
     // result data
     const [outputString, setOutputString] = useState<string>("");
 
@@ -101,9 +110,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         setNumGenerators(Math.max(numGenerators - 1, 0));
         setCurrentGeneratorIndex(currentGeneratorIndex > newMaxIndex ? newMaxIndex : currentGeneratorIndex);
         edges.pop();
-    }
-    
-    
+    }    
 
     const reloadStoredGraph = () => {
         const stored = localStorage.getItem("cayleygraph");
@@ -118,7 +125,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
     }, []);
     const numEdges = () => edges.reduce((acc, row) => acc + row.length, 0);
     //
-    const edgesMap = function<T>(edges: GraphEdge[][], f: (e: GraphEdge, listIndex?: number, vertexIndex?: number) => T): (T)[][] {
+    const edgesMap = function<T>(edges: GraphEdge[][], f: (e: GraphEdge, listIndex: number, vertexIndex: number) => T): (T)[][] {
        // edges are a list of lists of pairs.
         return edges.map((row, i) => row.map((edge, j) => f(edge, i, j)));
     }
@@ -211,7 +218,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         const length = vertices.length;
         const newVertices = [...vertices];
         for (let i = 0; i < length; i++) {
-            newVertices.push(new Vector2(WIDTH - vertices[i].x, vertices[i].y));
+            newVertices.push({x: WIDTH - vertices[i].x, y: vertices[i].y});
         }
         const success = setVertices(newVertices);
 
@@ -235,7 +242,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
             map[i] = recentIndex;
         }
         const success = setVertices(newVertices);
-        const addedEdges = edgesMap(edges, ([i, j]) => [map[i], map[j]]);
+        const addedEdges: [number, number][][] = edgesMap(edges, ([i, j]) => [map[i], map[j]]);
         const newEdges = [...edges];
         for (let i = 0; i < addedEdges.length; i++) {
             newEdges[i] = [...newEdges[i], ...addedEdges[i]];
@@ -264,19 +271,17 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         const success = setVertices(newVertices);
         
         //const addedEdges = edgesMap(edges, ([i, j]) => [map[i], map[j]]);
-        const newEdges = [...edges];
-        for (let i = 1; i < n; i++) {
-            // For each segment of the rotation,
-            let arrayDistance = i * length;
-            for (let j = 0; j < edges.length; j++) 
-            {
-                // for each list of edges,
-                let newEdgeCoset = edgesMap<[number,number]>(edges, ([i, j]) => [i + arrayDistance, j + arrayDistance]);
-                for (let k = 0; k < newEdgeCoset.length; k++) {
-                    newEdges[j] = [...newEdges[j], ...newEdgeCoset[k]];
-                }
+        const newEdges = edges.map(r => r.slice());
+        for (let edgeListIndex = 0; edgeListIndex < edges.length; edgeListIndex++)  {
+            for (let spokeIndex = 1; spokeIndex < n; spokeIndex++) {
+                edges[edgeListIndex].forEach(([i, j]) => {
+                    const newI = i + vertices.length * spokeIndex;
+                    const newJ = j + vertices.length * spokeIndex;
+                    newEdges[edgeListIndex].push([newI, newJ]);
+                });
             }
         }
+        
         
         // const newEdges = [...edges, ...new Array((n - 1) * edges.length).fill(0).map((_, i) => [])];
         setEdges(newEdges);
@@ -358,7 +363,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         }
         
 
-        const currentVertex = vertices?.[vertexInd];
+
         // Detect overlapping vertices for the entire set of vertices, forming an array of clusters
     const distance = (a: CayleyGraphVertex, b: CayleyGraphVertex) => Math.hypot(a.x - b.x, a.y - b.y);
     const clusters = vertices.map((pos, i) => {
@@ -382,24 +387,11 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         console.log("edges:", edges);
     }
 
-    console.log(filteredClusters);
-    
-    // get rid of duplicoate clusters by position
-    let generatorSelectors = [];
     
     let isValidCayleyGraph = validateCayleyGraph(vertices, edges);
     console.log("isValidCayleyGraph", isValidCayleyGraph);
     
     
-    /*
-    (index: number) => {
-        if (!isValidCayleyGraph) return undefined;
-        const orders = edges.map((row, i) => determineGeneratorOrder(row));
-        const order = orders[index];
-        const element = group.values.find(el => getElementOrder(group, el) == order);
-        return element;
-    }*/
-    let orderToElements;
     let edgeOrders;
     if (isValidCayleyGraph) {
         // Display the other section of the GUI, where we select a monoid
@@ -410,6 +402,8 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
     
 // persist the state in storage so that we can load it later
    
+let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.keys(d)).flat())]
+
     return (
         <div className="CayleyGraphEditor__container" onKeyPress={(event) => onkeydown(event)}>
             <div className="SelectorPanel">
@@ -442,12 +436,20 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
                 <div className="SelectorGroup">
                     <SelectorComponent
                         name={"Group"}
-                        options={Object.keys(groupData)}
+                        options={subgroupNames}
                         selected={[groupName]}
                         mode={"PickOne"}
                         set={(arr) => setChosenGroup(arr[0])}
                         />
-                    <GraphMatchingSelector n={numGenerators} groupName={groupName} edgeOrders={edgeOrders} edges={edges} vertices={vertices} setGeneratedEdges={setGeneratedEdges} setOutputString={setOutputString}/>
+                    <GraphMatchingSelector 
+                        mainGroup={transformationGroup} 
+                        subgroupName={groupName}  
+                        edgeOrders={edgeOrders} 
+                        edges={edges} 
+                        vertices={vertices} 
+                        setGeneratedEdges={setGeneratedEdges} 
+                        setOutputString={setOutputString}
+                    />
                 </ div>
             )}
             </div>

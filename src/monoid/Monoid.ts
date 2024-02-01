@@ -1,12 +1,14 @@
 import { Quaternion, Vector3 } from "three";
 import { Indexed, IndexedFGM } from "./IndexedMonoid";
 import { getElementOrder } from "../logic/cayleyLogic";
+import { quaternionCompare } from "../logic/equality";
 
 
 export type Monoid<T> = {
     name: string;
     identity: T;
     multiply: (a: T, b: T) => T;
+    compare: (a: T, b: T) => boolean | number;
 };
  
 export const getElementsOfOrder = function<T>(monoid: IndexedFGM<T>, order: number): Indexed<T>[] {
@@ -27,5 +29,6 @@ export const quaternionMonoid: QuaternionMonoid = {
     name: "Quaternion",
     identity: new Quaternion(),
     multiply: (a, b) => new Quaternion().multiplyQuaternions(b, a),
+    compare: quaternionCompare, // lower =  same
 };
 

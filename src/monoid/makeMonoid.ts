@@ -1,6 +1,7 @@
 import { Box3, BufferGeometry, Quaternion, TypedArray, Vector3 } from "three";
-import { FinitelyGeneratedMonoid, Indexed, IndexedFGM, indexMonoid } from "../monoid/IndexedMonoid";
+import { FiniteMonoid, FinitelyGeneratedMonoid, Indexed, IndexedFGM, IndexedFM, indexMonoid } from "../monoid/IndexedMonoid";
 import { E3 } from "../Display";
+import { Monoid } from "./Monoid";
 
 export const getCenter = (geom: BufferGeometry) => (new Box3().setFromPoints(getPointsFromGeom(geom)).getCenter(new Vector3()));
 
@@ -31,6 +32,19 @@ export const getPointsFromGeom = function(geom: BufferGeometry): Vector3[] {
 
 export const POS_ID = new Vector3();
 export const ROT_ID = new Quaternion();
+export const makeMonoidFromEdgeList = function(edges: [number, number][][]) {
+
+    // Generate a monoid from a list of lists of edges
+    const monoid: FinitelyGeneratedMonoid<number> = {
+        generators: edges.map((edgeList, i) => i),
+        name: "Monoid generated from edge list",
+        identity: 0,
+        multiply: function (a: number, b: number): number {
+            throw new Error("Function not implemented.");
+        }
+    };
+
+}
 
 export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: number, name: string, extraRotations = []) : IndexedFGM<E3> {
     const center = new Vector3(0, 0, 0);
@@ -49,16 +63,19 @@ export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: num
     return returnMonoid;
 }
 
-export const makeSubmonoid = function<T>(m: IndexedFGM<T>, generators: Indexed<T>[]): IndexedFGM<T> {
+export const makeEmbeddedSubmonoid = function<T>(m: IndexedFGM<T>, generators: Indexed<T>[], name = m.name) {
+    // This time, we keep the indices the same and just have arrays with some undefined elements
     const values: Indexed<T>[] = [m.identity];
     let queue: Indexed<T>[] = [m.identity];
-    let index = 1;
-    let seenIndices =   new Set();
+    let seenIndices = new Set();
     seenIndices.add(0);
+    
+    // filter the identity
+    generators = generators.filter((gen) => gen.index !== 0);
     while (queue.length) {
         const newQueue: Indexed<T>[] = [];
         let element;
-        while (element = queue.shift()) {
+        while ((element = queue.shift()) !== undefined) {
             
             for (const generator of generators) {
                 const newElement = m.multiply(element, generator);
@@ -74,19 +91,66 @@ export const makeSubmonoid = function<T>(m: IndexedFGM<T>, generators: Indexed<T
                     seenIndices.add(newElement.index);
                     
                     // new element in monoid
-                    values.push({...newElement, index});
-                    index++;
+                    values.push({...newElement});
                     newQueue.push(newElement);
                 }
             }
         }
         queue = newQueue;
     }
-    
     const monoid: IndexedFGM<T> = {
         generators: generators.slice(),
         identity: m.identity,
         multiply: m.multiply,
+        compare: m.compare,
+        name,
+        elements: values
+    }
+    console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
+     return monoid;
+}
+
+
+export const makeSubmonoid = function<T>(m: FinitelyGeneratedMonoid<T>, generators: T[]): FiniteMonoid<T> {
+    const values: T[] = [m.identity];
+    let queue: T[] = [m.identity];
+    let index = 1;
+    let seen = new Set();
+    const resultGenerators = [];
+    seen.add(m.identity);
+    let max = 10000;
+    
+    while (queue.length) {
+        const newQueue: T[] = [];
+        let element;
+        while ((element = queue.shift()) !== undefined) {
+            
+            for (const generator of generators) {
+                const newElement = m.multiply(element, generator);
+                
+                let presentInValues = seen.has(newElement);
+                
+                
+                if (!presentInValues) {
+                    seen.add(newElement);
+                    // new element in monoid
+                    values.push(newElement);
+                    index++;
+                    newQueue.push(newElement);
+                    if (index > max) {
+                        throw new Error("Max size exceeded");
+                    }
+                }
+            }
+        }
+        queue = newQueue;
+    }
+    
+    const monoid: FiniteMonoid<T> = {
+        generators: generators.slice(),
+        identity: m.identity,
+        multiply: m.multiply,
+        compare: m.compare,
         name: m.name,
         elements: values
     }

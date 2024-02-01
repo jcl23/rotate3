@@ -6,8 +6,8 @@ const data: CayleyGraphData[] = [
 ]
 
 // a function that takes graphdata,and a mapping from the generator indices to the new indices, and returns a new graphdata with the vertices and edges reindexed.
-const reindexCayleyData = function(data: CayleyGraphData, indexMap: number[], group: IndexedFGM<number[]>): CayleyGraphData {
-    const vertices = indexMap.map((index) => data.vertices[index]);
+const reindexCayleyData = function(data: CayleyGraphData, indexMap: Map<number, CayleyGraphVertex>, group: IndexedFGM<number[]>): CayleyGraphData {
+    const vertices = data.vertices
     const edges = data.edges.map((list) => list.map(([from, to]): [number,number] => [indexMap.indexOf(from), indexMap.indexOf(to)]));
     return { vertices, edges };
 }
@@ -83,13 +83,12 @@ const getElementOrder = function<T>(monoid: IndexedFGM<T>, element: Indexed<T>):
 }
 
 const monoidToOrderRecord = function<T>(m: IndexedFGM<T>): Record<number, Indexed<T>[]> {
-    const orders = m.elements.map((el) => getElementOrder(m, el));
-    const maxOrder = Math.max(...orders);
-    const orderRecord: Record<number, Indexed<T>[]> = {};
-    for (let i = 0; i <= maxOrder; i++) {
-        orderRecord[i] = m.elements.filter((el) => getElementOrder(m, el) == i);
-    }
-    return orderRecord;
+    return m.elements.reduce((acc: Record<number, Indexed<T>[]>, el) => {
+        const index = getElementOrder(m, el);
+        acc[index] ??= [];
+        acc[index].push(el);
+        return acc;
+    }, {});
 }
 
 
