@@ -1,6 +1,7 @@
 import { Box3, BufferGeometry, Quaternion, TypedArray, Vector3 } from "three";
-import { FinitelyGeneratedMonoid, Indexed, IndexedFGM, indexMonoid } from "../monoid/IndexedMonoid";
-import { Transform } from "../Display";
+import { FiniteMonoid, FinitelyGeneratedMonoid, Indexed, IndexedFGM, IndexedFM, indexMonoid } from "../monoid/IndexedMonoid";
+import { E3 } from "../Display";
+import { Monoid } from "./Monoid";
 
 export const getCenter = (geom: BufferGeometry) => (new Box3().setFromPoints(getPointsFromGeom(geom)).getCenter(new Vector3()));
 
@@ -31,13 +32,26 @@ export const getPointsFromGeom = function(geom: BufferGeometry): Vector3[] {
 
 export const POS_ID = new Vector3();
 export const ROT_ID = new Quaternion();
+export const makeMonoidFromEdgeList = function(edges: [number, number][][]) {
 
-export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: number, name: string, extraRotations = []) : IndexedFGM {
+    // Generate a monoid from a list of lists of edges
+    const monoid: FinitelyGeneratedMonoid<number> = {
+        generators: edges.map((edgeList, i) => i),
+        name: "Monoid generated from edge list",
+        identity: 0,
+        multiply: function (a: number, b: number): number {
+            throw new Error("Function not implemented.");
+        }
+    };
+
+}
+
+export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: number, name: string, extraRotations = []) : IndexedFGM<E3> {
     const center = new Vector3(0, 0, 0);
     const points =  getPointsFromGeom(geom);
     const rotations = points.map(point => new Quaternion().setFromAxisAngle(point.normalize(), Math.PI * 2 / degree));
     Array.prototype.push.apply(rotations, extraRotations);
-    const monoid: FinitelyGeneratedMonoid = {
+    const monoid: FinitelyGeneratedMonoid<E3> = {
         generators: rotations.map((rotation) => ({ rotation, position: center })),
         identity: { rotation: ROT_ID, position: center },
         multiply: ({ rotation: r1, position: p1 }, { rotation: r2, position: p2 }) => ({ rotation: new Quaternion().multiplyQuaternions(r2, r1), position: new Vector3().addVectors(p1, p2) })
@@ -45,38 +59,101 @@ export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: num
     }
     const returnMonoid =  indexMonoid(monoid, 0.01);
 
-    console.log(`Monoid for ${geom.type} of size: `, returnMonoid.values.length);
+    console.log(`Monoid for ${geom.type} of size: `, returnMonoid.elements.length);
     return returnMonoid;
 }
 
-export const makeSubmonoid = function(m: IndexedFGM, generators: Indexed<Transform>[]): IndexedFGM {
+export const makeEmbeddedSubmonoid = function<T>(m: IndexedFGM<T>, generators: Indexed<T>[], name = m.name) {
+    // This time, we keep the indices the same and just have arrays with some undefined elements
+    const values: Indexed<T>[] = [m.identity];
+    let queue: Indexed<T>[] = [m.identity];
+    let seenIndices = new Set();
+    seenIndices.add(0);
     
-const values: Indexed<Transform>[] = [];
-    let queue: Indexed<Transform>[] = [m.identity];
+    // filter the identity
+    generators = generators.filter((gen) => gen.index !== 0);
     while (queue.length) {
-        const newQueue: Indexed<Transform>[] = [];
+        const newQueue: Indexed<T>[] = [];
         let element;
-        while (element = queue.shift()) {
-            values.push(element);
+        while ((element = queue.shift()) !== undefined) {
+            
             for (const generator of generators) {
                 const newElement = m.multiply(element, generator);
-                let index = values.findIndex((_el) => _el.index == newElement.index);
-                if (index < 0) {
+                if (
+                    newElement.index >= m.elements.length
+                    || newElement.index < 0) {
+                    throw new Error("Index out of bounds");
+                }
+                let presentInValues = seenIndices.has(newElement.index);
+                
+                
+                if (!presentInValues) {
+                    seenIndices.add(newElement.index);
+                    
                     // new element in monoid
+                    values.push({...newElement});
                     newQueue.push(newElement);
                 }
             }
         }
         queue = newQueue;
     }
-    
-    const monoid: IndexedFGM = {
+    const monoid: IndexedFGM<T> = {
         generators: generators.slice(),
         identity: m.identity,
         multiply: m.multiply,
-        name: m.name,
-        values
+        compare: m.compare,
+        name,
+        elements: values
     }
-    console.log("Generated submonoid of size: ", monoid.values.length, " from ", generators.length, " generators.")
+    console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
+     return monoid;
+}
+
+
+export const makeSubmonoid = function<T>(m: FinitelyGeneratedMonoid<T>, generators: T[]): FiniteMonoid<T> {
+    const values: T[] = [m.identity];
+    let queue: T[] = [m.identity];
+    let index = 1;
+    let seen = new Set();
+    const resultGenerators = [];
+    seen.add(m.identity);
+    let max = 10000;
+    
+    while (queue.length) {
+        const newQueue: T[] = [];
+        let element;
+        while ((element = queue.shift()) !== undefined) {
+            
+            for (const generator of generators) {
+                const newElement = m.multiply(element, generator);
+                
+                let presentInValues = seen.has(newElement);
+                
+                
+                if (!presentInValues) {
+                    seen.add(newElement);
+                    // new element in monoid
+                    values.push(newElement);
+                    index++;
+                    newQueue.push(newElement);
+                    if (index > max) {
+                        throw new Error("Max size exceeded");
+                    }
+                }
+            }
+        }
+        queue = newQueue;
+    }
+    
+    const monoid: FiniteMonoid<T> = {
+        generators: generators.slice(),
+        identity: m.identity,
+        multiply: m.multiply,
+        compare: m.compare,
+        name: m.name,
+        elements: values
+    }
+    console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
      return monoid;
 }

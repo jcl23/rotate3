@@ -1,4 +1,4 @@
-import { PosetDiagramComponentProps } from "../cfg/SubgroupDiagram";
+import { PosetDiagramComponentProps } from "../ui/SubgroupDiagram";
 import { IndexedFGM } from "../monoid/IndexedMonoid";
 
 export type OverallData = {

@@ -14,6 +14,7 @@ export const MyCamera = function ({ type, ...props }: MyCameraProps) {
 
   useLayoutEffect(() => {
     if (cameraRef.current) {
+      // cameraRef.current = 
       cameraRef.current.aspect = size.width / size.height;
       cameraRef.current.updateProjectionMatrix();
       cameraRef.current.lookAt(new Vector3(0,0,0));

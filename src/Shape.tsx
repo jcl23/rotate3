@@ -32,19 +32,22 @@ import {
   Vector3,
 } from "three";
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
+import defaultSpringConfig from "./cfg/springs";
 
-import { Transform } from "./Display";
 
-import { defaultColors, defaultShapes } from "./DefaultMeshes";
+
+import { defaultShapes } from "./DefaultMeshes";
 
 import { MeshRefractionMaterial } from "@react-three/drei/materials/MeshRefractionMaterial";
 import makeTextMesh from "./textMaterials";
 import { createMultiMaterialObject } from "three/examples/jsm/utils/SceneUtils.js";
+import { E3 } from "./Display";
+import { defaultColors, secondaryColors } from "./cfg/colors";
 
 export type Step<T> = { from: T; to: T };
 export type ShapeProps = {
   shape: keyof typeof defaultShapes;
-  transform: Step<Transform>;
+  transform: Step<E3>;
 };
 
 
@@ -59,18 +62,14 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
     from: { t: 0 },
     to: { t: 1 },
     reset: true,
-    config: {
-      easing: easings.easeOutExpo,
-      duration: 2000,
-      clamp: true,
-    },
+    config: defaultSpringConfig,
   });
   // useFrame to update the rotation value
   useFrame((state, delta) => {
     const intermediateRotation = new Quaternion().slerpQuaternions(
       ref.current.quaternion,
       transform.from.rotation,
-      0.5
+      0.3
     );
     (ref.current.quaternion as Quaternion).slerpQuaternions(
       intermediateRotation,
@@ -99,6 +98,7 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
   let geo: THREE.BufferGeometry;
   
   const color = defaultColors[shape] ?? "0x000000";
+  const color2 = secondaryColors[shape] ?? "0x000000";
   geo = useMemo<BufferGeometry>(defaultShapes[shape], [shape]);
   const scaleMiddle = 0.90;
   const scaleInner = 0.80
@@ -130,17 +130,19 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
       }),
     [color]
   );
-  /*
+  
   const middleMatFace = useMemo(
     () =>
-    new MeshRefractionMaterial({
-   
-      opacity: 0.8,
+    new MeshPhysicalMaterial({
+      color: color2,
+      opacity: 0.7,
       transparent: true,
+      reflectivity: 0.2,
+
     }),
     [color]
   );
-  */
+  
   const innerMatFace = useMemo(
     () =>
       new MeshStandardMaterial({
@@ -152,7 +154,7 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
         }),
     [shape]
   );
-let mmobj = createMultiMaterialObject(geo, [matLine, matFace]);
+
   matLine.resolution.set(window.innerWidth, window.innerHeight);
 
   const linesMesh = useMemo(
@@ -168,16 +170,16 @@ let mmobj = createMultiMaterialObject(geo, [matLine, matFace]);
     () => new Mesh(outerFaceGeom, matFace),
     [outerFaceGeom, matFace]
   );
-  /*
+  
   const middleFaceMesh = useMemo(
     () => new Mesh(middleFaceGeom, middleMatFace),
     [middleFaceGeom, middleMatFace]
   );
-  */
- const middleFaceMesh = useMemo(
-   () => makeTextMesh(middleFaceGeom, color),
-   [middleFaceGeom]
- );
+  
+//  const middleFaceMesh = useMemo(
+//    () => Mesh(middleFaceGeom, color),
+//    [middleFaceGeom]
+//  );
   const innerFaceMesh = useMemo(
     () => new Mesh(innerFaceGeom, innerMatFace),
     [innerFaceGeom, innerMatFace]
@@ -195,9 +197,9 @@ let mmobj = createMultiMaterialObject(geo, [matLine, matFace]);
   
   return (
     <a.mesh ref={ref}>
+
       <primitive object={outerFaceMesh} /> 
       <primitive object={middleFaceMesh} /> 
-
       <primitive object={innerFaceMesh} />
       <primitive object={linesMesh} />
     </a.mesh>

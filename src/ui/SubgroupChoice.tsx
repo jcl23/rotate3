@@ -1,7 +1,7 @@
-import { Subgroup } from "../data/subgroupData";
+import { SubgroupData } from "../data/subgroupData";
 
 export type SubgroupChoiceProps = {
-    choices: Subgroup[];
+    choices: SubgroupData[];
     choiceIndex: number;
     setChoiceIndex: (n: number) => void;
 }

@@ -10,8 +10,12 @@ button {
 
 :root {
   --button-inactive: rgb(59, 55, 55);
-  --button-active: rgb(231, 82, 56);
+  --button-halfactive: rgb(161, 73, 57);
+  --button-active: rgb(245, 202, 146);
   --accent-dark: rgb(0, 0, 0);
+
+  --BACKGROUND1: rgb(180,180,180);
+  --BACKGROUND2: #cccccc;
 }
 
 #root {
@@ -81,9 +85,39 @@ html, body {
 }
 
 .MainSelector_inner {
-
+   position: absolute;
+   top: 0;
+   left: 0;
+   display: flex;
+   flex-direction: row;
 }
 
+.SelectorPanel {
+  flex-direction: row;
+  display: flex;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+}
+
+.SelectorGroup {
+  position: relative;
+  width: min-content;
+  padding: 20px;
+  top: 0;
+  background: #ffffff60;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+.MainSelector__outer {
+  
+  z-index: 0;
+
+}
 .MainSelector_button {
   border-radius: 1px;
 }
@@ -94,6 +128,12 @@ html, body {
 }
 .SubgroupDiagram div:active {
 
+}
+
+.SelectorComponent__outer {
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
 }
 foreignObject > div {
   margin: 0 auto;
@@ -135,6 +175,10 @@ foreignObject span > div {
   border: 1px solid red;
 }
 
+.CayleyGraph svg {
+  background: var(--BACKGROUND2);
+}
+
 .SubgroupDiagram__holder {
   background: rgb(255, 255, 255);
 }
@@ -150,12 +194,15 @@ foreignObject span > div {
   height: 50px; display: flex; overflow-x: scroll;
 }
 
-.generator-button {
+.transform-button {
   display: inline-flex;
   margin: 0 auto;
   flex-basis: 100%;
   justify-content: center;
   padding: 10px;
+}
+.generator-button {
+  background-color: #aacc44
 }
 
 .SubgroupChoice__outer {
@@ -179,4 +226,130 @@ foreignObject span > div {
 
 .GroupInfo__holder > p > span {
   text-align: center;
+}
+
+.CayleyGraphEditor__container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: #ffffffaa;
+  overflow: hidden;
+  z-index: 1;
+  }
+  
+  .CayleyGraphEditor__outer {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  min-width:  400px;
+  background: white;
+  border: 1px solid black;
+  z-index: 10;
+  padding: 30px;
+  }
+  
+  .CayleyGraphEditor__button {
+  border: 2px solid grey;
+  padding: 5px;
+  border-radius: 5px;
+  background: #40a6f440;
+  }
+
+  .CayleyGraphEditor__body {
+     
+    
+    border: 1px solid black;
+    background: var(--BACKGROUND1);
+    max-width: 500px;
+  }
+  
+  .CayleyGraphEditor__grid {
+    background-image: repeating-linear-gradient(#ccc 0 1px, transparent 1px 100%), repeating-linear-gradient(90deg, #ccc 0 1px, transparent 1px 100%);
+    background-size: 10% 10%;
+
+    width: 100%;
+    aspect-ratio: 1;
+   
+
+  }
+
+  .CayleyGraphEditor__grid svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .CayleyGraphEditor__lower {
+    padding: 20px;
+    padding-bottom: 30px;
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .CayleyGraphEditor__lower > button {
+    border: 2px solid grey;
+    padding: 15px;
+    vertical-align: middle;
+    text-align: center; 
+    align-items: center;
+    /* vertical text align */
+    display: flex;
+
+    border-radius: 5px;
+    background: #40a6f440;
+  }
+
+  h2, h3, h4, h5 {
+    margin: 5px;
+  }
+
+  .notification-container {
+    
+  }
+
+  .CayleyGraph > * {
+    grid-row-start: 1;
+    grid-column-start: 1;
+  }
+
+  .CayleyPanel__grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(25px, 35px));
+    gap: 2px; /* Adjust the gap as needed */
+    max-width: 200px;
+  }
+
+  
+  .CayleyPanel__grid button {
+    border-width: 1px;
+  }
+
+  .CayleyPanel__grid > button:last-child {
+    grid-column: span auto; /* Make the last button extend to the end */
+  }
+
+  .highlighted {
+    background: var(--button-active);
+  }
+  .highlighted2 {
+    background: var(--button-halfactive);
+  }
+  .inactive {
+    background: #555;
+  }
+
+  button {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add box shadow for a skeuomorphic look */
+    transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Add transition for smoother hover effect */
+  }
+
+button:hover {
+  background-color:var(--button-active); /* Change background color on hover */
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Adjust box shadow on hover for depth effect */
+}
+
+.grid-item:last-child {
+  grid-column: span 2; /* Make the last button extend to the end */
 }
