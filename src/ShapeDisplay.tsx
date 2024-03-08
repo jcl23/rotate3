@@ -161,14 +161,18 @@ export const ShapeDisplay = function ({
 
     return (
         <div className="ShapeDisplay">
-          <div>
+          <div style={{
+              width: "100%",
+              height: "100%",
+
+            }}>
           <Canvas
              style={{
               width: "100%",
-              aspectRatio: "1/1",
+              height: "100%",
 
             }}
-            background={new Color("#000")}
+            background={"#FF0000"}
             
             gl={{ 
               antialias:true, 
@@ -185,9 +189,10 @@ export const ShapeDisplay = function ({
             <PerformanceMonitor onDecline={() => set(true)} />
              
              
-            <fog attach="fog" args={["#eee", 0, 15]} />
+            <fog attach="fog" args={["#999", 0, 15]} />
               <MyCamera type={cameraType} />
-              <CameraControls />
+              <CameraControls  />
+
               <spotLight position={[2, 2, 1]}  intensity={2} castShadow={true} />
               <spotLight position={[-2, -2, -4]}  intensity={4} castShadow={true} />
               <pointLight position={[0, 4, 2]} intensity={20} />
@@ -206,7 +211,7 @@ export const ShapeDisplay = function ({
               />
            </mesh>
           */}
-         
+     
               {/* below: a spotlight pointing straight down */}
                 
               {stableShape}

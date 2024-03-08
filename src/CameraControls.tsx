@@ -6,7 +6,7 @@ export type CameraControlsProps = {
 
 export const CameraControls = function ({ setCameraType }: CameraControlsProps) {
     return (
-        <div>
+        <div style={{left: "50%"}}>
                 {cameraPositionKeys.map((_cameraType, i) => {
                     if (setCameraType === undefined) {
                         return  <span key={`ControlBlock_cameraspan#${i}`}>

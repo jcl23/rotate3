@@ -3,6 +3,9 @@
   height: 100%;
   width: 100%;
 }
+.App,html {
+  pointer-events: none;
+}
 
 button {
   font-family: Helvetica, sans-serif;
@@ -53,7 +56,6 @@ h1, h2, h3, h4, h5 {
 html, body {
   width: 100%;
   height: 100%;
-  background:linear-gradient(0deg, rgb(17, 54, 78) 0%,  rgb(118, 118, 118) 100%)
 }
 
 
@@ -71,6 +73,7 @@ html, body {
   margin: 0px auto;
   display: flex;
   flex-direction: column;
+  pointer-events: all;
 }
 .MonoidDisplay_header {
   width: calc(100% - 20px -2px);
@@ -93,6 +96,7 @@ html, body {
 }
 
 .SelectorPanel {
+  pointer-events: all;
   flex-direction: row;
   display: flex;
   position: absolute;
@@ -114,7 +118,7 @@ html, body {
   height: 100%;
 }
 .MainSelector__outer {
-  
+  pointer-events: all;
   z-index: 0;
 
 }
@@ -124,6 +128,7 @@ html, body {
 
 .SubgroupDiagram {
   width: 100%; 
+  pointer-events: all;
   aspect-ratio: 1, 
 }
 .SubgroupDiagram div:active {
@@ -131,6 +136,7 @@ html, body {
 }
 
 .SelectorComponent__outer {
+  pointer-events: all;
   display: flex;
   flex-direction: column;
   padding: 10px;
@@ -160,9 +166,16 @@ foreignObject span > div {
   width: min-content;
   
 }
-
+#leva__root {
+  pointer-events: all;
+}
 .ShapeDisplay {
-  
+  position: absolute;
+  left: 20%;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
 }
 .ShapeDisplay > div {
   background: rgb(255, 255, 255);

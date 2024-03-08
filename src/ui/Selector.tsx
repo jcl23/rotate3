@@ -5,48 +5,37 @@ export type SelectorData<T> = {
     name: string,
     options: T[] | number[],
     selected: T[] | number[],
-    mode: "PickOne" | "PickMany" | "Index",
+    mode: "Value" | "Index",
     useIndices?: boolean
-    set: React.Dispatch<React.SetStateAction<T[] & number>>,
+    set: React.Dispatch<React.SetStateAction<(T | number)[]>>,
     outerProps?: HTMLProps<HTMLDivElement>,
 }
 
 export function SelectorComponent<T extends { toString: () => string } | number>(data: SelectorData<T>) {
-    const {options, selected, set, mode, name, useIndices = false, outerProps = {} } = data;
+    const {options, selected, set, mode, name, outerProps = {} } = data;
     console.log("SelectorComponent:", data);
     let elements;
-    if (mode == "PickOne") {
+    if (mode == "Value") {
         elements = options.map((option, i) => (
             <button 
                 onClick={
                     () => {
-                        console.log("Calling set on", [useIndices ? i : option]);
-                        set([useIndices ? i : option]) 
+                        console.log("Calling set on", [option]);
+                        set([option]) 
                     }
                 } 
                 key={`SelectorComponent_option#${i}`}
-                style={{background: selected.includes(useIndices ? i : option) ? "lightblue" : "white" }}
+                style={{background: selected.includes(option) ? "lightblue" : "white" }}
             >
                 {option.toString()}
             </button>
         ));
-    }
-    if (mode == "PickMany") {
+    } else {
         elements = options.map((option, i) => (
-            <button onClick={() => set([...selected, useIndices ? i : option])} key={`SelectorComponent_option#${i}`}>{option}</button>
+            <button onClick={() => set(i)} key={`SelectorComponent_option#${i}`}>{option}</button>
         ));
     }
-    if (mode == "Index") {
-        elements = options.map((option, i) => (
-            <button onClick={() => set(i)} key={`SelectorComponent_option#${i}`}>{useIndices ? i : option}</button>
-        ));
-    }
-    if (mode == "Action") {
-        elements = options.map((option, i) => (
-            <button onClick={() => set([option])} key={`SelectorComponent_option#${i}`}>{option}</button>
-        ));
-    
-    }
+   
 
     return (
         <div className="SelectorComponent__outer" {...outerProps} >

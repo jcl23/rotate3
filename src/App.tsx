@@ -18,19 +18,18 @@ import { CameraType } from "./types/camera.ts";
 import subgroupDiagramData, { SubgroupDiagramData } from "./data/subgroupDiagramData.ts";
 import { SubgroupDiagramComponent } from "./ui/SubgroupDiagram.tsx";
 import { CayleyGraph } from "./CayleyGraph.tsx";
-type SubgroupsData = Record<GeometryName, Partial<Record<GroupName, number[]>>>;
-import subgroupsData, { ConjugacyClass, SubgroupData, SubgroupsData} from "./data/subgroupData";
+import subgroupsData, { ConjugacyClass, SubgroupData } from "./data/subgroupData";
 
-import { MathComponent } from "mathjax-react";
+
 import { SubgroupChoice } from "./ui/SubgroupChoice.tsx";
 
 import { useControls } from "leva";
-import { makeEmbeddedSubmonoid, makeSubmonoid } from "./monoid/makeMonoid.ts";
-import { GeometryName, GroupName } from "./DefaultMeshes.tsx";
+import { makeEmbeddedSubmonoid} from "./monoid/makeMonoid.ts";
+import { GeometryName} from "./DefaultMeshes.tsx";
 import { CayleyGraphEditor } from "./ui/CayleyGraphEditor.tsx";
-import { makeEdges } from "./Edges.ts";
+
 import { cayleyGraphData } from "./data/cayleyGraphData.ts";
-import projectMonoid from "./monoid/projectMonoid.ts";
+
 import { CayleyPanel } from "./ui/CayleyPanel.tsx";
 import useIndexState from "./hooks/useIndexedState.ts";
 import { Partial } from "@react-spring/web";
@@ -76,9 +75,9 @@ function App() {
    const subgroup = makeEmbeddedSubmonoid(currentMonoid, subgroupData.generators.map(i => currentMonoid.elements[i]), conjugacyClass.name);
    const reindexedSubgroup = indexMonoid(subgroup);
    const [monoidValue, setMonoidValue] = useState(currentMonoid.identity);
-   const currentGroupName = currentMonoid.name;
+   const currentGroupName = subgroup.name;
 
-   const currentSubgroupDiagramData: SubgroupDiagramData = subgroupDiagramData[currentGroupName];
+   const currentSubgroupDiagramData: SubgroupDiagramData = subgroupDiagramData[currentMonoid.name];
    currentSubgroupDiagramData.labels = availableConjugacyClasses.map(c => c.name);
    if (monoidValue.index > currentMonoid.elements.length) {
       setMonoidValue(currentMonoid.identity);
@@ -136,15 +135,26 @@ function App() {
          className="App"
          style={{ overflow: showCGEditor ? "hidden" : "inherit" }}
       >
+         
          <div
             style={{
                width: "calc(max(50vw, 600px))",
                height: "45vh",
-               display: "flex",
+
                margin: "0 auto",
                marginTop: "50px",
             }}
          >
+            <ShapeDisplay
+                  
+                  shape={geomName}
+                  cameraType={"orthographic"}
+                  transform={monoidValue}
+                  stepIndex={0}
+                  availableTransformations={elementsToDisplay}
+                  generators={generators}
+               />
+               <CameraControls setCameraType={setCameraType} />
             <div style={{ width: "33%" }}>
                <button onClick={() => setShowCGEditor(true)}>
                   Cayley Graph Editor
@@ -162,6 +172,7 @@ function App() {
                />
                {!showCGEditor && (
                   <MainSelector
+                     setGeometry={setGeomNameIndex}
                      geometryData={{
                         name: "Geometry",
                         options: geomNameList,
@@ -197,18 +208,11 @@ function App() {
                   setMonoidValue={setMonoidValue}
                />
 
-               <ShapeDisplay
-                  
-                  shape={geomName}
-                  cameraType={"orthographic"}
-                  transform={monoidValue}
-                  stepIndex={0}
-                  availableTransformations={elementsToDisplay}
-                  generators={generators}
-               />
-               <CameraControls setCameraType={setCameraType} />
+               
             </div>
-            <div style={{ width: "33%" }}>
+            <div style={{display: "flex", justifyContent: "space-around"}}>
+
+            <div style={{ width: "40%" }}>
                <div className="SubgroupDiagram__holder">
                   <SubgroupDiagramComponent
                      size={10}
@@ -231,7 +235,7 @@ function App() {
                   className="GroupInfo__holder"
                   style={{ marginTop: "auto", height: "10vh " }}
                >
-                  <h1>{currentMonoid.name}</h1>
+                  <h1>{currentGroupName}</h1>
                   <p style={{ justifyContent: "space-around", display: "flex" }}>
                      <span style={{ flexGrow: 2 }}>Order:</span>
                      <span style={{ flexGrow: 1 }}>
@@ -239,8 +243,6 @@ function App() {
                      </span>
                   </p>
                </div>
-            </div>
-            <div style={{ width: "33%" }}>
                <div>
                   {controlVals.showCayleyGraph && (
                      <CayleyGraph
@@ -253,9 +255,15 @@ function App() {
                      />
                   )}
                </div>
+            </div>
+            <div style={{ width: "33%" }}>
+               
+               {/*
                <div>
                   <CayleyPanel group={currentMonoid} />
                </div>
+               */}
+            </div>
             </div>
          </div>
       </div>

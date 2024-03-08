@@ -113,6 +113,7 @@ export const CayleyGraph = function ({
         aspectRatio: "1/1",
         display: "grid",
         position: "relative",
+        transform: "scale(1.4)",
       }}
     >
       <svg viewBox="0 0 200 200" width={240} height={240}>
