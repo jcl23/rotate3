@@ -18,6 +18,7 @@ import compareMonoids from "../monoid/compareMonoids";
 import { makeHomomorphism } from "../monoid/homomorphism";
 import { E3 } from "../Display";
 import { Vector2 } from "three";
+import { getPerformance } from "firebase/performance";
 
 type GraphMatchingSelectorProps = {
   mainGroup: IndexedFGM<E3>;
@@ -32,8 +33,8 @@ type GraphMatchingSelectorProps = {
 
 
 export const GraphMatchingSelector = function ({ mainGroup, subgroupName, edgeOrders, edges, vertices }: GraphMatchingSelectorProps) {
-  if (subgroupsData.Cube == undefined) return;
-  const subgroupIsomorphismClass = subgroupsData.Cube[subgroupName] ?? [];
+  
+  const subgroupIsomorphismClass = subgroupsData[mainGroup.name][subgroupName] ?? [];
   const subgroups = subgroupIsomorphismClass.conjugacyClasses.map((c) => c.members).flat();
   // by order, a list of indices of elements of the parent group, to be 
   // included as generators of the subgroup.
@@ -57,7 +58,7 @@ export const GraphMatchingSelector = function ({ mainGroup, subgroupName, edgeOr
   });
   
   
-  console.log(subgroup.elements)
+  console.log("GRAPHMATCHINGSELECTOR", subgroup.elements)
   const indexedSubgroup = indexMonoid(subgroup);
   if (localSubgroupData === undefined) {
     throw new Error(`[ GraphMatchingSelector ] Subgroup is undefined`);
@@ -227,9 +228,8 @@ export const GraphMatchingSelector = function ({ mainGroup, subgroupName, edgeOr
     // Regex to remove the first, last braces if there are any.
     // generatedEdges = foundEdges;
     stringToCopy = stringToCopy.replace(/^\{/, "").replace(/\}$/, "");
-
   return (
-    <div className="SelectorComponent__outer">
+    <div className="SelectorComponent__outer GraphMatchingSelector">
 
       {edgeOrders.map((order, i) => {
 

@@ -2,7 +2,7 @@ import {useEffect, useMemo, useState } from "react";
 import React from "react";
 import { Indexed, IndexedMonoid } from "./IndexedMonoid";
 import { defaultShapes } from "../DefaultMeshes";
-import { GEN_COLORS } from "../cfg/colors";
+import { edgeColors } from "../cfg/colors";
 
 
 
@@ -21,6 +21,10 @@ export type MonoidDisplayProps<T> = {
   setMonoidValue: SetAction<Indexed<T>>;
 };
 
+export function useMonoid = function<T> (monoid: IndexedMonoid<T>) {
+  const [monoidValue, setMonoidValue] = useState(monoid.identity);
+  return { monoidValue, setMonoidValue };
+}
 export const FGIMonoidDisplay = function<T> ({
   // Responsible for managing 
   monoid,
@@ -81,7 +85,7 @@ export const FGIMonoidDisplay = function<T> ({
         {availableTransformations.map((transform, i) => {
           const isGenerator = generators.some((generator) => generator.index === transform.index);
           const style = isGenerator ? {
-            backgroundColor: GEN_COLORS[i % GEN_COLORS.length]
+            backgroundColor: edgeColors[i % edgeColors.length]
           } : {};
           return (
 

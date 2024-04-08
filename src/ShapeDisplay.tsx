@@ -11,6 +11,7 @@ import { CameraControls, Environment, Lightformer, PerformanceMonitor } from "@r
 import { set } from "firebase/database";
 import { Partial } from "@react-spring/three";
 
+
 const AXIS_RADIUS = 0.05;
 export type ShapeDisplayProps = {
     children?: JSX.Element | JSX.Element[];
@@ -50,7 +51,6 @@ export const quaternionToAxis = function(numSegments: number) {
 export const ShapeDisplay = function ({
     shape,
     transform: { value: { rotation, position } },
-    stepIndex,
     cameraType,
     
     children,
@@ -135,14 +135,9 @@ export const ShapeDisplay = function ({
     const [fromPosition, setFromPosition] = useState(new Vector3());
     const [toPosition, setToPosition] = useState(new Vector3());
   
-    const setPosition = function (position: Vector3) {
-      setFromPosition(toPosition);
-      setToPosition(position);
-    };
-  
     const firstUpdate = useRef(true);
   
-    useLayoutEffect(() => {
+    /*useLayoutEffect(() => {
       if (firstUpdate.current) {
         firstUpdate.current = false;
         return;
@@ -150,29 +145,23 @@ export const ShapeDisplay = function ({
       if (localStepIndex === stepIndex) return;
       setLocalStepIndex(stepIndex);
       // setTransform({ rotation, position });
-    }, [stepIndex, cameraType]);
+    }, [stepIndex, cameraType]);*/
   
-    
   
-    useEffect(() => {
-        console.log("camera set: ", cameraType);
-    }, [cameraType]);
+
 
 
     return (
-        <div className="ShapeDisplay">
+        <div className="ShapeDisplay labelled">
           <div style={{
-              width: "100%",
-              height: "100%",
 
             }}>
+           
           <Canvas
              style={{
-              width: "100%",
-              height: "100%",
-
+              aspectRatio: "1",
             }}
-            background={"#FF0000"}
+            background={"transparent"}
             
             gl={{ 
               antialias:true, 
@@ -187,9 +176,7 @@ export const ShapeDisplay = function ({
             shadows
           >
             <PerformanceMonitor onDecline={() => set(true)} />
-             
-             
-            <fog attach="fog" args={["#999", 0, 15]} />
+              <fog attach="fog" args={["#FFF", 0, 15]} />
               <MyCamera type={cameraType} />
               <CameraControls  />
 
@@ -199,17 +186,6 @@ export const ShapeDisplay = function ({
               <ambientLight intensity={0.1}/>
               {/*
               <pointLight  position={[-4, -1, -2]} intensity={100} />
-
-
-           
-           <mesh receiveShadow={true} position={[0, -1, 0]} rotation={[Math.PI * 3/ 2,0,0]} >
-             <planeGeometry args={[50, 50, 1, 1]} />
-             <meshStandardMaterial
-              metalness={0.2}
-              roughness={0.4}
-              color="#ffffff"
-              />
-           </mesh>
           */}
      
               {/* below: a spotlight pointing straight down */}

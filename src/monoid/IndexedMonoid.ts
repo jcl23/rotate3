@@ -3,7 +3,7 @@ import { Monoid } from "./Monoid";
 import { makeCayleyTable } from "../logic/cayleyTables";
 
 
-export type Indexed<T> = {index: number, value: T};
+export type Indexed<T> = {index: number, value: T, name?: string};
 type IndexedMonoid<T> = Monoid<Indexed<T>> & {
     cayleyTable?: Indexed<T>[][];
     elements: Indexed<T>[];

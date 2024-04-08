@@ -25,7 +25,7 @@ export function SelectorComponent<T extends { toString: () => string } | number>
                     }
                 } 
                 key={`SelectorComponent_option#${i}`}
-                style={{background: selected.includes(option) ? "lightblue" : "white" }}
+                style={{background: selected.includes(option) ? "lightblue" : "black" }}
             >
                 {option.toString()}
             </button>

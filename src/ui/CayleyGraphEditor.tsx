@@ -15,7 +15,7 @@ import { validateCayleyGraph, determineGeneratorOrder, getElementOrder  } from "
 import { GeometryName, GroupName } from "../DefaultMeshes";
 import groupData from "../data/groupData";
 
-import { IndexedFGM } from "../monoid/IndexedMonoid";
+
 import { GraphMatchingSelector } from "./GraphMatchingSelector";
 import { set } from "firebase/database";
 import { SolidMonoids } from "../data/platonicsolids";
@@ -51,12 +51,13 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
     const [numGenerators, setNumGenerators] = useState<number>(0);
     const [currentGeneratorIndex, setCurrentGeneratorIndex] = useState<number>(0);
     // Group Data
+    
     const [geomName, setGeomName] = useState<GeometryName>("Cube");
     const transformationGroup = SolidMonoids[geomName];
     const [groupName, setChosenGroup] = useState<GroupName>("1");
     // const [subgroupName, setChosenSubgroup] = useState<GroupName>("1");
-    const group = groupData["S_4"];
-    if (group === undefined) {
+   // const group = groupData[outerGroupName];
+    if (false) {
         throw new Error(`[CayleyGraphEditor] Group ${groupName} is undefined`);
     }
     // result data
@@ -300,7 +301,6 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         position: "absolute",
         top: 0, left: 0,
         width: "100%", height: "100%",
-        background: "#ffffffaa",            
     });
     
     let outerStyle = styleToCss({
@@ -308,7 +308,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         top: "50%", left: "50%",
         transform: "translate(-50%, -50%)",
         width: "50vw", height: "80vh",
-        background: "white",
+       
         border: "1px solid black",
         zIndex: 1,
         padding: "30px",
@@ -399,6 +399,16 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         console.log("Orders:", edgeOrders);
        // orderToElements = monoidToOrderToPossibleElements(group);
     }
+
+    const toPrinted = () => {
+        // make a new list of vertices by mapping round down the decimals of the x and y values to 1 place
+        const roundedVertices = vertices.map(({x, y}) => ({x: Math.round(x), y: Math.round(y)}));
+        const str = JSON.stringify({vertices: roundedVertices, edges}).replaceAll("\"", "");
+
+
+        return str;
+    
+    }
     
 // persist the state in storage so that we can load it later
    
@@ -417,7 +427,13 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
                         "Add": addGenerator,
                         "Delete": removeGenerator,
                     }} />
-                    <SelectorComponent useIndices={true} outerProps={{style: {flexDirection:"row"}}} name={"Choice"} options={new Array(numGenerators).fill(0).map((_, i) => i + 1)} selected={[currentGeneratorIndex ?? -1]} mode={"PickOne"} set={arr => setCurrentGeneratorIndex(arr[0])}  /> 
+                     
+                    <div style={{display: "flex", flexDirection: "row"}}>
+                        {Array(numGenerators).fill(0).map((_, i) => (
+                            <button key={`CayleyGraphEditor__generator[${i}]`} onClick={() => setCurrentGeneratorIndex(i)}>{i + 1}</button>
+                        ))}
+                    </div>
+                
 
                     <ActionSelectorComponent name={""} actions={{
                         ["Reflect (Y-axis)"]: reflectYAxis,
@@ -433,14 +449,17 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
 
                 
             {isValidCayleyGraph && (
-                <div className="SelectorGroup">
-                    <SelectorComponent
-                        name={"Group"}
-                        options={subgroupNames}
-                        selected={[groupName]}
-                        mode={"PickOne"}
-                        set={(arr) => setChosenGroup(arr[0])}
-                        />
+                <div className="SelectorComponent__outer SelectorGroup">
+                    <div>
+                        {subgroupNames.map(name => (
+                            <button key={`CayleyGraphEditor__subgroup[${name}]`} onClick={() => setChosenGroup(name)}>{name}</button>
+                        ))}
+                    </div>
+                    <div style={{display: "flex", flexDirection: "row"}}>
+                        {["Cube","Icosahedron", "Tetrahedron", "Octahedron", "Dodecahedron"].map((s, i) => (
+                            <button style={(s == geomName) ? {background: "lightblue"} : {}} key={`CayleyGraphEditor__generator[${i}]`} onClick={() => setGeomName(s)}>{s}</button>
+                        ))}
+                    </div>
                     <GraphMatchingSelector 
                         mainGroup={transformationGroup} 
                         subgroupName={groupName}  
@@ -450,7 +469,8 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
                         setGeneratedEdges={setGeneratedEdges} 
                         setOutputString={setOutputString}
                     />
-                </ div>
+                </div>
+             
             )}
             </div>
              <ReactHotkeys 
@@ -533,7 +553,10 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
                     }}>
                         Save
                     </button>
-                    <button onClick={() => {}/*generate*/}>Copy</button>
+                    <button onClick={() => {
+                        // copy the string to clipboard
+                        navigator.clipboard.writeText(toPrinted());
+                    }}>Copy</button>
                 </div>
             </div>
             </div>

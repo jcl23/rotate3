@@ -15,13 +15,13 @@ export const defaultShapes = {
     Dodecahedron: () => new DodecahedronGeometry(0.8).toNonIndexed(),
 }
 export type GeometryName = keyof typeof defaultShapes;  
-export type GroupName = "1" | "Z_2" | "Z_3" | "K_4" | "Z_4" | "Z_5" | "Z_6" | "D_4" | "S_3" | "A_4" | "S_4";
+export type GroupName = "1" | "Z_2" | "Z_3" | "K_4" | "Z_4" | "Z_5" | "Z_6" | "D_4" | "S_3" | "A_4" | "S_4" | "A_5" | "D_10";
 
 
 
 
-const cubeMonoid = makeMonoidFromGeometry(new BoxGeometry(1, 1, 1), 3, "Cube");
-const icoMonoid = makeMonoidFromGeometry(new IcosahedronGeometry(1), 5, "Ico");
-const tetraMonoid = makeMonoidFromGeometry(new TetrahedronGeometry(1), 3, "Tetra");
-const octaMonoid = makeMonoidFromGeometry(new OctahedronGeometry(1), 4, "Octa");
-const dodMonoid = makeMonoidFromGeometry(new DodecahedronGeometry(1), 3, "Dodeca");
+// const cubeMonoid = makeMonoidFromGeometry(new BoxGeometry(1, 1, 1), 3, "Cube");
+// const icoMonoid = makeMonoidFromGeometry(new IcosahedronGeometry(1), 5, "Ico");
+// const tetraMonoid = makeMonoidFromGeometry(new TetrahedronGeometry(1), 3, "Tetra");
+// const octaMonoid = makeMonoidFromGeometry(new OctahedronGeometry(1), 4, "Octa");
+// const dodMonoid = makeMonoidFromGeometry(new DodecahedronGeometry(1), 3, "Dodeca");

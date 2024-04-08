@@ -2,6 +2,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 import { useRef, useEffect, useLayoutEffect } from "react";
 import { Vector3 } from "three/src/math/Vector3.js";
 import { cameraPositions } from "./cfg/camera-positions";
+import { OrthographicCamera } from "@react-three/drei";
 
 
 type MyCameraProps = {
@@ -25,5 +26,10 @@ export const MyCamera = function ({ type, ...props }: MyCameraProps) {
     set({ camera: cameraRef.current });
   }, [type]);
 
-  return <perspectiveCamera  position={cameraPositions[type] ?? cameraPositions["front-facing"]} ref={cameraRef} {...props} />;
+  if (type === "perspective") {
+
+    return <perspectiveCamera  position={cameraPositions[type] ?? cameraPositions["front-facing"]} ref={cameraRef} {...props} />;
+  } else {
+    return <OrthographicCamera makeDefault position={cameraPositions[type] ?? cameraPositions["front-facing"]} ref={cameraRef} />;
+  }
 };
