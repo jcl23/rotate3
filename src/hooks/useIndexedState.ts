@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { STRICT_INDICES } from '../cfg/consts';
-type IndexHookPair = [number, (index: number) => void];
+type IndexHookPair = [number, Dispatch<SetStateAction<number>>];
 const useIndexState = <T>(reference: T[]): IndexHookPair => {
     //  This is because im frusterated by how it keeps not loading cause i forget subgroup data
     if (reference === undefined){

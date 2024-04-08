@@ -37,10 +37,6 @@ import defaultSpringConfig from "./cfg/springs";
 
 
 import { defaultShapes } from "./DefaultMeshes";
-
-import { MeshRefractionMaterial } from "@react-three/drei/materials/MeshRefractionMaterial";
-import makeTextMesh from "./textMaterials";
-import { createMultiMaterialObject } from "three/examples/jsm/utils/SceneUtils.js";
 import { E3 } from "./Display";
 import { defaultColors, secondaryColors } from "./cfg/colors";
 
@@ -65,7 +61,7 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
     config: defaultSpringConfig,
   });
   // useFrame to update the rotation value
-  useFrame((state, delta) => {
+  useFrame(() => {
     const intermediateRotation = new Quaternion().slerpQuaternions(
       ref.current.quaternion,
       transform.from.rotation,

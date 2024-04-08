@@ -1,6 +1,6 @@
 
 
-import { StyleHTMLAttributes, useRef, useState } from "react";
+import { StyleHTMLAttributes, useEffect, useRef, useState } from "react";
 
 
 
@@ -12,9 +12,12 @@ import { PTR_COLOR } from "./cfg/colors";
 import { Vector2, Vector3 } from "@react-three/fiber";
 import { animated, useSpring } from "react-spring";
 import defaultSpringConfig from "./cfg/springs";
+import { MathComponent } from "mathjax-react";
 
 type CayleyGraphPointerProps = {
   transform: Step<{x: number, y: number}>;
+  text: string;
+  width: number;
 };
 
 function useAnimatedPosition(position: { x: string; y: string }, style: Partial<StyleHTMLAttributes<typeof animated.div>>["style"] = {}) {
@@ -29,10 +32,11 @@ function useAnimatedPosition(position: { x: string; y: string }, style: Partial<
     config: defaultSpringConfig,
     position: "absolute",
     transform: "translate(-50%, -50%)",
+    width: `${style.width}`
   };
   const attrs = useSpring(animatedStyle);
   return {
-    style: { ...attrs,  ...style},
+    style: {   ...style, ...attrs},
     ref: (ref) => {
       // The ref is `null` on component unmount
       if (ref) {
@@ -41,9 +45,11 @@ function useAnimatedPosition(position: { x: string; y: string }, style: Partial<
     },
   };
 }
-export const Pointer = function({ transform }: CayleyGraphPointerProps) {
-  const frameRef = useRef(null);
+
   
+export const Pointer = function({ transform, text, width }: CayleyGraphPointerProps) {
+  const frameRef = useRef(null);
+  const textRef = useRef(null);
   /*
   const { x, y } = useSpring({
     ...transform,
@@ -52,21 +58,37 @@ export const Pointer = function({ transform }: CayleyGraphPointerProps) {
   
   console.log(transform, x, y);
   */
- 
+ console.log("Container", textRef.current);
+ let currentWidth = textRef.current?.firstChild.firstChild.firstChild.width?.animVal?.value ?? 0;
+ /*useEffect(() => {
+    console.log("Container", textRef.current);
+    currentWidth = textRef.current?.firstChild?.firstChild?.firstChild?.width?.animVal?.value ?? 0;
+  }, [textRef.current?.firstChild?.firstChild?.firstChild]);
+  */
  const style = {
-    width: "6%",
+   
     height: "6%",
     background: "transparent",
     border: "2px solid black",
-    borderRadius: "100%",
-  
+    width: `${width}px`,
+    borderRadius: '15px',
+    padding: `0px 3px`,
+    // width: `${textRef.current?.getComputedStyle().width ?? 0}px`,
  };
  const position = transform.to;
  const animationProps = useAnimatedPosition(position, style);
- console.log("STYLE:", animationProps.style.transform)
+ console.log("STYLE:", animationProps.style.transform, animationProps.style.width)
  return (
-   
+  <>
+    <div className="Pointer" ref={textRef} style={{
+      fontSize: `1.75cqw`,
+      
+    }}>
+
+      <MathComponent  className={"tex2jax_process pointer"}  tex={text ?? "No text"}  />
+    </div> 
    <animated.div {...animationProps} ref={frameRef} />
+  </>
 
     );
   }

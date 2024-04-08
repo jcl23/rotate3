@@ -8,15 +8,23 @@ export type SubgroupChoiceProps = {
 
 export function SubgroupChoice({choices, choiceIndex, setChoiceIndex}: SubgroupChoiceProps) {
     if (choices == null || choices.length == 0) {
-        return <div style={{width: "100%"}}>No subgroups</div>
+        return (
+            <div className="SubgroupChoice__outer">
+                <div style={{width: "100%"}}>No subgroups</div>
+            </div>
+            )
     }
     if (choices.length == 1) {
-        return <div style={{width: "100%"}}>{choices[0].name}</div>
+        return (
+            <div className="SubgroupChoice__outer">
+                <div style={{width: "100%"}}>{choices[0].name}</div>
+            </div>
+            )
     }
     const previousIndex = (choiceIndex - 1 + choices.length) % choices.length;
     const nextIndex = (choiceIndex + 1) % choices.length;
     return (
-        <div className="SubgroupChoice__outer" style={{display: "inline-flex"}}>
+        <div className="SubgroupChoice__outer">
             <div style={{width: "20%"}}>Prev</div>
             <button onClick={(() => setChoiceIndex(previousIndex))} style={{width: "20%"}}>{'<'}</button>
             <div style={{width: "30%"}}>{choices[choiceIndex].name}</div>

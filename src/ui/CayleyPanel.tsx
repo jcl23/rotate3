@@ -35,7 +35,7 @@ export const CayleyPanel = function({group}: CayleyPanelProps) {
     return (
         <div className="CayleyPanel__outer">
             <div className="CayleyPanel__grid">
-                {group.elements.map((e, i) => <button className={buttonClassNameByIndex(i)} onClick={() => {toggle(i)}}>{i}</button>)}
+                {group.elements.map((e, i) => <button key={`CayleyPanel__button[${i}]`} className={buttonClassNameByIndex(i)} onClick={() => {toggle(i)}}>{i}</button>)}
             </div>
             <div>
                 <button>Generate Cayley Graph</button>

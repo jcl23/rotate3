@@ -29,9 +29,9 @@ export const SubgroupDiagramComponent = function(props: PosetDiagramComponentPro
                
                 <foreignObject  x={x-8} y={y - 8} width="16" height="16">
                     <div style={{  backgroundColor: color  }} onClick={(e) => onClick(e)}  xmlns="http://www.w3.org/1999/xhtml" >
-                        <span style={{pointerEvents: "none"}}>
+                        <span>
                             <MathComponent className={"tex2jax_process"}  style={{height:"100%", width: "20px", background: "transparent"}} tex={"" + ( labels[index] ?? index + 1)} />
-                    
+    
                         </span>
                     </div>
                 </foreignObject>

@@ -27,24 +27,18 @@ body {
   margin: 0;
 }
 button {
-  font-size: 3.2em;
   line-height: 1.1;
+  font-size: 1em;
+  font-weight: 500;
 }
 
 button {
-  font-size: 1em;
-  font-weight: 500;
-  font-family: Helvetica;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
+ 
 }
-button:hover {
-  border-color: #646cff;
-}
+
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+
 }
 
 @media (prefers-color-scheme: light) {
@@ -53,7 +47,7 @@ button:focus-visible {
     background-color: #ffffff;
   }
   a:hover {
-    color: #747bff;
+ 
   }
   button {
     background-color: #f9f9f9;

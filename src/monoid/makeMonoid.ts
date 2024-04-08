@@ -49,7 +49,7 @@ export const makeMonoidFromEdgeList = function(edges: [number, number][][]) {
 export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: number, name: string, extraRotations = []) : IndexedFGM<E3> {
     const center = new Vector3(0, 0, 0);
     const points =  getPointsFromGeom(geom);
-    const rotations = points.map(point => new Quaternion().setFromAxisAngle(point.normalize(), Math.PI * 2 / degree));
+    const rotations = points.map(point => new Quaternion().setFromAxisAngle(point.normalize(), Math.PI * 2 / degree).normalize());
     Array.prototype.push.apply(rotations, extraRotations);
     const monoid: FinitelyGeneratedMonoid<E3> = {
         generators: rotations.map((rotation) => ({ rotation, position: center })),
@@ -78,7 +78,9 @@ export const makeEmbeddedSubmonoid = function<T>(m: IndexedFGM<T>, generators: I
         while ((element = queue.shift()) !== undefined) {
             
             for (const generator of generators) {
-                const newElement = m.multiply(element, generator);
+                let newElement = m.multiply(element, generator);
+                
+                newElement = {...newElement, index: newElement.index, value: newElement.value};
                 if (
                     newElement.index >= m.elements.length
                     || newElement.index < 0) {
@@ -97,6 +99,19 @@ export const makeEmbeddedSubmonoid = function<T>(m: IndexedFGM<T>, generators: I
             }
         }
         queue = newQueue;
+    };
+    let cayleyTable: Indexed<T>[][];
+    if (m.cayleyTable) {
+        // a new cayley table
+        cayleyTable = [];
+        for (let i = 0; i < values.length; i++) {
+            const value1 = values[i];
+            cayleyTable[value1.index] = [];
+            for (let j = 0; j < values.length; j++) {
+                const value2 = values[j];
+                cayleyTable[value1.index][value2.index] = (m.cayleyTable[value1.index][value2.index]);
+            }
+        }
     }
     const monoid: IndexedFGM<T> = {
         generators: generators.slice(),
@@ -104,12 +119,85 @@ export const makeEmbeddedSubmonoid = function<T>(m: IndexedFGM<T>, generators: I
         multiply: m.multiply,
         compare: m.compare,
         name,
-        elements: values
+        elements: values,
+        cayleyTable: cayleyTable ?? m.cayleyTable
     }
     console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
      return monoid;
 }
+type HasName = { name: string };
+export const  labelMonoid = function<T>(m: IndexedFGM<T>, generators: { el: Indexed<T>, name: string }[]): IndexedFGM<T> {
+    // update the typescript types later to accomodate a name parameter
+    const values: (Indexed<T> & HasName)[] = [{...m.identity, name: "" }];
+    let queue: Indexed<T>[] = [values[0]];
 
+    let seenIndices = new Set();
+    seenIndices.add(0);
+    
+    // filter the identity
+    generators = generators.filter((gen) => gen.el.index !== 0);
+    while (queue.length) {
+        const newQueue: Indexed<T>[] = [];
+        let element;
+        while ((element = queue.shift()) !== undefined) {
+            
+            for (const generator of generators) {
+                const { el: generatorEl, name: generatorName } = generator;
+                const product = m.multiply(element, generatorEl);
+                
+                let presentInValues = seenIndices.has(product.index);
+                
+                
+                if (!presentInValues) {
+                    // m.elements.find(canonical => canonical.index == newElement.index).name = element.name + generatorName;
+                    seenIndices.add(product.index);
+                    
+                    // new element in monoid
+                    let newElement = {...product, name: element.name + generatorName}
+                    values.push(newElement);
+                    newQueue.push(newElement);
+                }
+            }
+        }
+        queue = newQueue;
+    }
+    values[0].name = "e";
+
+    for (const element of values) {
+        let name = element.name;
+        let count = 1;
+        let newName = "";
+        for (let i = 1; i < name.length; i++) {
+            if (name[i] === name[i - 1]) {
+                count++;
+            } else {
+                if (count > 1) {
+                    newName += `${name[i - 1]}^${count}`;
+                } else {
+                    newName += name[i - 1];
+                }
+                count = 1;
+            }
+        }
+        if (count > 1) {
+            newName += `${name[name.length - 1]}^${count}`;
+        } else {
+            newName += name[name.length - 1];
+        }
+        element.name = newName;
+    }
+    return {
+        ...m,
+        multiply: function(a: Indexed<T>, b: Indexed<T>) {
+            const underlying =  m.cayleyTable[a.index][b.index];
+            return { ...underlying  };
+            
+        },
+        generators: generators.map(({ el }, i) => values[i + 1]),
+        elements: values,
+        compare: (x, y) => x.index - y.index,
+    }
+}
 
 export const makeSubmonoid = function<T>(m: FinitelyGeneratedMonoid<T>, generators: T[]): FiniteMonoid<T> {
     const values: T[] = [m.identity];
