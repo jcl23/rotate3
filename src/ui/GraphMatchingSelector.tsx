@@ -5,8 +5,8 @@ import { FinitelyGeneratedMonoid, Indexed, IndexedFGM, indexMonoid } from "../mo
 import { makeEmbeddedSubmonoid, makeSubmonoid } from "../monoid/makeMonoid";
 import { GeneratorSelector } from "./GeneratorSelector";
 import { SelectorComponent } from "./Selector";
-import { GraphEdge } from "./CayleyGraphEditor";
-import { CayleyGraphVertex } from "../CayleyGraph";
+import { GraphEdge } from "./cayleygraph/CayleyGraphEditor";
+import { CayleyGraphVertex } from "./cayleygraph/CayleyGraph";
 import { set } from "firebase/database";
 import subgroupsData_, { IsomorphismClass, SubgroupData, SubgroupsData } from "../data/subgroupData";
 const subgroupsData: Record<GeometryName, Record<GroupName, IsomorphismClass>> = subgroupsData_;
@@ -26,13 +26,15 @@ type GraphMatchingSelectorProps = {
   shapeName: GeometryName;
   setChosenGroup: (groupName: string) => void;
   setGeneratedEdges: (generatedEdges: [number, number][]) => void;
+  setHighlighted: (highlighted: number[]) => void;
+  
   edgeOrders: number[];
   edges: GraphEdge[][];
   vertices: CayleyGraphVertex[];
 };
 
 
-export const GraphMatchingSelector = function ({ mainGroup, subgroupName, edgeOrders, edges, vertices }: GraphMatchingSelectorProps) {
+export const  GraphMatchingSelector = function ({ mainGroup, subgroupName, setHighlighted, edgeOrders, edges, vertices }: GraphMatchingSelectorProps) {
   
   const subgroupIsomorphismClass = subgroupsData[mainGroup.name][subgroupName] ?? [];
   const subgroups = subgroupIsomorphismClass.conjugacyClasses.map((c) => c.members).flat();
@@ -49,7 +51,7 @@ export const GraphMatchingSelector = function ({ mainGroup, subgroupName, edgeOr
   const subgroup = makeEmbeddedSubmonoid(mainGroup, localSubgroupData.generators.map(i => mainGroup.elements[i]));
   
   const orderRecord = monoidToOrderRecord(subgroup);
-  const clone = indexMonoid(subgroup);
+  // const clone = indexMonoid(subgroup);
 
   const targetGeneratorIndicesDefault = edgeOrders.map(order => orderRecord[order]?.[0].index ?? -1);
   const [state, setState] = useState({
@@ -164,14 +166,27 @@ export const GraphMatchingSelector = function ({ mainGroup, subgroupName, edgeOr
       compare: (a, b) => a - b,
     };
     const graphMonoid = makeSubmonoid(graphMonoidData, graphMonoidData.generators);// indexMonoid(graphMonoidData);
+    // generate cycles for each generator, display them as dots
+    const highlighted: number[] = [];
+    graphMonoidData.generators.forEach((gen, i) => {
+      const cycle = [];
+      let next = gen;
+      while (!cycle.includes(0)) {
+        cycle.push(next);
+        next = graphMonoidData.multiply(0, next);
+      }
+      highlighted.push(...cycle);
+    });
+    setHighlighted([...new Set(highlighted)]);
+  
     // might be valid generators
     const generatorMap = new Map();
-    let orderOf = (i: number) => getElementOrder(clone, clone.elements[i]);
+    let orderOf = (i: number) => getElementOrder(subgroup, subgroup.elements.find(({ index }) => index == i));
     let unseen = new Set();
-    clone.generators.forEach(({ index }) => unseen.add(index));
-    const smallRecord = monoidToOrderRecord(clone);
+    subgroup.generators.forEach(({ index }) => unseen.add(index));
+    const smallRecord = monoidToOrderRecord(subgroup);
     for (let i = 0; i < targetGeneratorIndices.length; i++) {
-      const generatorIndex = clone.generators[i].index;
+      const generatorIndex = subgroup.generators[i].index;
       const order = orderOf(generatorIndex);
       const target = smallRecord[order]?.find(({ index }) => unseen.has(index));
       if (target !== undefined) {
@@ -181,13 +196,18 @@ export const GraphMatchingSelector = function ({ mainGroup, subgroupName, edgeOr
       }
     } 
    
-    // clone.generators = state.targetGeneratorIndices.map(i => mainGroup.elements[i]);
-    const phi = makeHomomorphism(clone, graphMonoid, generatorMap);
+    // subgroup.generators = e.targetGeneratorIndices.map(i => mainGroup.elements[i]);
+    const phi = makeHomomorphism(subgroup, graphMonoid, generatorMap);
     const phiInverse = new Map<number,number>();
-    for (let i = 0; i < clone.elements.length; i++) phiInverse.set(phi.get(i) ?? 0, i);
+    for (let i = 0; i < subgroup.elements.length; i++) phiInverse.set(phi.get(i), i);
     const newVertices: CayleyGraphVertex[] = [];
+    console.log({phi, phiInverse})
     for (let i = 0; i < phi.size; i++) {
-      newVertices.push(vertices[phi.get(i) ?? 0]);
+      const vertexIndex = phi.get(i);
+      if (vertexIndex === undefined) {
+      throw new Error(`[ GraphMatchingSelector ] vertexIndex is undefined`);
+    }
+      newVertices.push(vertices[vertexIndex]);
     }
     const newEdges = edges.map(row => row.map(([a, b]): [number, number] => [phiInverse.get(a) ?? 0, phiInverse.get(b) ?? 0]));
 

@@ -1,5 +1,5 @@
 import { HTMLProps } from "react";
-import { EditorAction } from "./CayleyGraphEditor";
+import { EditorAction } from "./cayleygraph/CayleyGraphEditor";
 
 export type SelectorData<T> = {
     name: string,

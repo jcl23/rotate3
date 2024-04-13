@@ -23,33 +23,37 @@ export const SubgroupDiagramComponent = function(props: PosetDiagramComponentPro
             setActive(index);
         }
 
-        const color = index === active ? rs.getPropertyValue("--button-active"): rs.getPropertyValue("--button-inactive");
+        // const color = index === active ? rs.getPropertyValue("--button-active"): rs.getPropertyValue("--button-inactive");
         return (
-            <g  key={`poset_element_${index}`}>
-               
-                <foreignObject  x={x-8} y={y - 8} width="16" height="16">
-                    <div style={{  backgroundColor: color  }} onClick={(e) => onClick(e)}  xmlns="http://www.w3.org/1999/xhtml" >
-                        <span>
-                            <MathComponent className={"tex2jax_process"}  style={{height:"100%", width: "20px", background: "transparent"}} tex={"" + ( labels[index] ?? index + 1)} />
-    
+ 
+                    <button key={`poset_element_${index}`} className={"SubgroupDiagram__button"} style={{ left: `calc(${x}% - 2pc)`, top: `calc(${y}% - 1.5pc)`, 
+                         }} onClick={(e) => onClick(e)}  xmlns="http://www.w3.org/1999/xhtml" >
+                            <MathComponent className={"tex2jax_process"}  style={{height:"100%", width: "100%", background: "transparent"}} tex={"" + ( labels[index] ?? index + 1)} />
+                        {/* <span>
                         </span>
-                    </div>
-                </foreignObject>
-            
-            </g>
+                         */}
+                    </button>
+             
+      
         )
     });
     return (
-        <svg className="SubgroupDiagram" xmlns='http://www.w3.org/2000/svg'  style={{}} viewBox="-10 -10 110 110">
-            {poset.map(([n, p], i) => {
-                const [x, y] = positions[n];
-                const [px, py] = positions[p];
-                return (
-                    <line stroke="var(--accent-dark)" key={`poset_edge_${i}`} x1={x} y1={y} x2={px} y2={py} />
-                )
-            })}
-            {groups}
-          
-        </svg>
+        <div className="SubgroupDiagram"  >
+            <svg xmlns='http://www.w3.org/2000/svg'  style={{}} viewBox="0 0 100 100">
+                {poset.map(([n, p], i) => {
+                    const [x, y] = positions[n];
+                    const [px, py] = positions[p];
+                    return (
+                        <line stroke="white" key={`poset_edge_${i}`} x1={x} y1={y} x2={px} y2={py} />
+                    )
+                })}
+            
+            </svg>
+           
+            <div style={{width: "100%", aspectRatio: 1 }}>
+
+                {groups}
+            </div>
+        </div>
     )
 }

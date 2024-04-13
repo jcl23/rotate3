@@ -11,7 +11,7 @@ import { ShapeDisplay } from "./ShapeDisplay";
 import { FGIMonoidDisplay } from "./monoid/MonoidDisplay.tsx";
 import { E3 } from "./Display";
 import { Indexed, IndexedFGM, indexMonoid } from "./monoid/IndexedMonoid";
-import { enumerateOrbits, SolidMonoids } from "./data/platonicsolids.ts";
+import { enumerateOrbits, enumeratePairs, SolidMonoids } from "./data/platonicsolids.ts";
 import { CameraControls } from "./CameraControls";
 import { MainSelector } from "./ui/MainSelector.tsx";
 import { CameraType } from "./types/camera.ts";
@@ -19,7 +19,7 @@ import subgroupDiagramData, {
   SubgroupDiagramData,
 } from "./data/subgroupDiagramData.ts";
 import { SubgroupDiagramComponent } from "./ui/SubgroupDiagram.tsx";
-import { CayleyGraph } from "./CayleyGraph.tsx";
+import { CayleyGraph } from "./ui/cayleygraph/CayleyGraph.tsx";
 import subgroupsData, {
   ConjugacyClass,
   IsomorphismClass,
@@ -33,7 +33,7 @@ import { SubgroupChoice } from "./ui/SubgroupChoice.tsx";
 import { useControls } from "leva";
 import { labelMonoid, makeEmbeddedSubmonoid } from "./monoid/makeMonoid.ts";
 import { GeometryName, GroupName } from "./DefaultMeshes.tsx";
-import { CayleyGraphEditor } from "./ui/CayleyGraphEditor.tsx";
+import { CayleyGraphEditor } from "./ui/cayleygraph/CayleyGraphEditor.tsx";
 
 import { cayleyGraphData, getCayleyGraphData } from "./data/cayleyGraphData.ts";
 
@@ -47,17 +47,28 @@ import { MonoidInput } from "./ui/MonoidInput.tsx";
 import useMonoidState from "./hooks/useMonoidState.ts";
 import { MathJaxContext } from "better-react-mathjax";
 import { DisplayQuaternion } from "./info/DisplayQuaternion.tsx";
+import { MemoizedMathJax } from "./ui/MemoizedMathJax.tsx";
+import { set } from "firebase/database";
+import { Bound } from "./error/Bound.tsx";
+import { SectionTitle } from "./info/SectionTitle.tsx";
 export const Controls = {};
 type QuaternionDisplayMode = "orthogonal" | "matrix" | "euler" | "axis-angle";
 const mathJaxConfig = {
   fastPreview: true,
   CommonHTML: { linebreaks: { automatic: true } },
-           showMathMenu: false,
+           showMathMenu: true,
            'HTML-CSS': {
-               linebreaks: { automatic: true, width: 'container' },
+               linebreaks: { width: 'container' },
                scale: 150
            }
 };
+
+export type AppState = {
+  geomName: GeometryName;
+  subgroupName: GroupName;
+  conjugacyClassIndex: number;
+  indexInClass: number;
+}
 // subgroupData = (subgroupData as SubgroupData);
 function App() {
   const [showCGEditor, setShowCGEditor] = useState(false);
@@ -76,22 +87,31 @@ function App() {
     },
     quaternionDisplayMode: {
       options: [ "matrix", "orthogonal", "euler", "axis-angle", "quaternion"]
+    },
+    vertexNames: {
+      options: [ "all", "selected", "none"]
     }
   });
   Controls.controlVals = controlVals;
-  // const { geomName }  = controlVals;
-  // geomName: {
-  //   options:  [ "Cube", "Icosahedron", "Dodecahedron", "Tetrahedron", "Octahedron"] ,
-  // },
-
-  // Cube | Icosahedron | Dodecahedron | Tetrahedron | Octahedron
-
   const geomNameList = Object.keys(SolidMonoids) as GeometryName[];
-  const [geomName, setGeomName] = useState(geomNameList[0]);
-
+  const defaultGeomName = geomNameList[0];
+  const defaultGroupName= SolidMonoids[defaultGeomName].name as GroupName ;
+  const defaultSubgroupName = "A_4";
+  const defaultConjugacyClassIndex = 0;
+  const defaultIndexInClass = 0;
+  // Convert the below code into a form that uses a single object for the groupName, subgroupName, etc.
+  const [state, setState] = useState<AppState>({
+    geomName: defaultGeomName,
+    subgroupName: defaultSubgroupName,
+    conjugacyClassIndex: defaultConjugacyClassIndex,
+    indexInClass: defaultIndexInClass,
+  });
+  
+ const {geomName, subgroupName, conjugacyClassIndex, indexInClass} = state;
+  const groupName = SolidMonoids[geomName].name as GroupName;
   const currentMonoid = SolidMonoids[geomName];
-  const groupName = currentMonoid.name as OuterGroupName;
-
+  const result = enumeratePairs(currentMonoid);
+  console.log("EnumeratePairs", {result});
   // Which isomorphism class of subgroups to show (now safely)
   const subgroupIsoClasses: IsomorphismClass[] = Object.values(
     subgroupsData[groupName]
@@ -99,9 +119,7 @@ function App() {
   const subgroupNames = Object.keys(
     subgroupsData[groupName]
   ) as SubgroupName<OuterGroupName>[];
-  const [subgroupName, selectSubgroupName] = useState<GroupName>(
-    subgroupNames[0]
-  );
+  
   const subgroupIsoClass: IsomorphismClass =
   subgroupsData[groupName][subgroupName];
   const allConjugacyClasses: ConjugacyClass[] = [];
@@ -113,25 +131,20 @@ function App() {
       data.conjugacyClasses.forEach((cjClass, cjClassIndex) => {
          allConjugacyClasses.push(cjClass);
          subgroupDiagramOnClick.push(function() {
-            selectSubgroupName(groupName);
-            setConjugacyClassIndex(cjClass.flatIndex);
+            setState({...state, subgroupName: groupName, conjugacyClassIndex: cjClassIndex, indexInClass: 0});
          });
       });
   });
   console.log({allConjugacyClasses});
   const availableConjugacyClasses: ConjugacyClass[] =
     subgroupIsoClass.conjugacyClasses;
-  const [conjugacyClassIndex, setConjugacyClassIndex] = useIndexState(
-   availableConjugacyClasses
-  );
 
   const conjugacyClass = availableConjugacyClasses[
       conjugacyClassIndex
     ];
   const indexInSubgroupDiagram = conjugacyClass.flatIndex;
-  console.log({flatIndex: conjugacyClass.flatIndex, conjugacyClassIndex})
-  const [indexWithinConjugacyClass, setIndexWithinConjugacyClass] = useIndexState(conjugacyClass.members);
-  const subgroupData = conjugacyClass.members[indexWithinConjugacyClass];
+  // console.log({flatIndex: conjugacyClass.flatIndex, conjugacyClassIndex})
+  const subgroupData = conjugacyClass.members[indexInClass];
 
   const subgroup = makeEmbeddedSubmonoid(
     currentMonoid,
@@ -165,19 +178,20 @@ function App() {
   if (monoidValue.index > currentMonoid.elements.length) {
     resetMonoid();
   }
-
+  /*
+  const setGeometry = function (geomName: GeometryName) {
+    // set the geomName, and reset the other properties
+    // set them to the defaults
+    setState({...state, geomName, indexInClass: 0, conjugacyClassIndex: 0, subgroupName: SolidMonoids[geomName].name as GroupName});
+  };*/
   useLayoutEffect(() => {
     // When the geometry changes, reset the subgroup class and choice indices, and the monoid value
-    setConjugacyClassIndex(0);
     resetMonoid();
     enumerateOrbits(currentMonoid);
   }, [geomName]);
   
   console.log("subgroupName: ", subgroupName);
 
-  const data = getCayleyGraphData(subgroupName, labelList)
-  const vertices = data ? data?.vertices : [];
-  const edges = data ? data?.edges : [];
 
   const generators = labeledSubgroup.generators;
 
@@ -198,10 +212,13 @@ function App() {
          <CayleyGraph monoid={currentMonoid} graphVertices={DefaultVertices.box} graphEdges={makeEdges(currentMonoid)}/>     
    */
   const setClassAndResetChoice = function (classIndex: number) {
-    setConjugacyClassIndex(classIndex);
-    setIndexWithinConjugacyClass(0);
+    setState({...state, conjugacyClassIndex: classIndex, indexInClass: 0});
     resetMonoid();
   };
+
+  const data = controlVals.showCayleyGraph ? getCayleyGraphData(subgroupName, labelList) : null;
+  const vertices = data ? data?.vertices : [];
+  const edges = data ? data?.edges : [];
 
   const transformations = labeledSubgroup.elements.filter(({ index }) => index != 0);
   const elementsToDisplay = controlVals.useAllValues
@@ -215,6 +232,7 @@ function App() {
   };
   return (
     <MathJaxContext config={mathJaxConfig}>
+<Bound>
 
     <div
       className="App net1"
@@ -229,7 +247,7 @@ function App() {
               />
       
    
-      <div style={{ width: "33%", display: "none" }}>
+      <div style={{ width: "33%"}}>
               
                   <div>
                   <CayleyPanel group={currentMonoid} />
@@ -239,21 +257,15 @@ function App() {
 
       <div className="MainContent">
         {!showCGEditor && (
-          <MainSelector
-          className="LeftPanel"
-          resetMonoid={resetMonoid}
-          setGeometry={setGeomName}
-          geometryName={geomName}
-          setIsoClass={selectSubgroupName}
-          subgroupName={subgroupName}
-          setConjugacyClassIndex={setConjugacyClassIndex}
-          conjugacyClassIndex={conjugacyClassIndex}
-          setIndexInClass={setIndexWithinConjugacyClass}
-          indexInClass={indexWithinConjugacyClass}
+          <MainSelector setAppState={setState} appState={state} resetMonoid={resetMonoid}       
+        
           />
           )}
-        <div className={"MiddlePanel"} style={{ display: "flex", flexDirection:"column"  }}> 
+        <div className={"MiddlePanel lineBorder"} style={{ display: "flex", flexDirection:"column"  }}> 
         <div >
+      
+          <div style={{ display: "flex", flexDirection:"column"  }}>
+            <h4 className="shapeName section-title" style={{width: "100%"}}>{`${geomName}`}</h4>
             <ShapeDisplay
             shape={geomName}
             cameraType={controlVals.cameraType}
@@ -262,18 +274,25 @@ function App() {
             availableTransformations={elementsToDisplay}
             generators={generators}
             />
+            </div>
            
       
         
           {controlVals.showCayleyGraph && (
-            <CayleyGraph
-            vertices={vertices}
-            edges={edges}
-            currentIndex={(function () {
-              let projectedIndex = project(monoidValue);
-              return projectedIndex;
-            })()}
-            />
+            <div  style={{ display: "flex", flexDirection:"column"  }}>
+            <h4 className="shapeName section-title" style={{width: "100%", paddingLeft: "7%", paddingBottom: "11px"}}><MemoizedMathJax formula={`\\[${groupName}\\]`}/></h4>
+
+              <CayleyGraph
+              
+              {...data}
+              currentIndex={(function () {
+                let projectedIndex = project(monoidValue);
+                return projectedIndex;
+              })()}
+              vertexNames={controlVals.vertexNames}
+              />
+            </div>
+
             )}
   
 
@@ -311,6 +330,8 @@ function App() {
         <div className={"RightPanel"} style={{ display: "flex", justifyContent: "space-around", width: "40%" }}>
             <div style={{  }}>
               <div className="SubgroupDiagram__holder">
+        <SectionTitle title="Subgroup Lattice" />
+
                 <SubgroupDiagramComponent
                   size={10}
                   poset={currentSubgroupDiagramData.poset}
@@ -324,8 +345,8 @@ function App() {
                     )}
                     />
                 <SubgroupChoice
-                  choiceIndex={indexWithinConjugacyClass}
-                  setChoiceIndex={setIndexWithinConjugacyClass}
+                  choiceIndex={indexInClass}
+                  setChoiceIndex={(i) => { setState({...state, indexInClass: i}); resetMonoid(); }}
                   choices={conjugacyClass.members}
                   />
               </div>
@@ -350,6 +371,7 @@ function App() {
           </div>
       </div>
         </div>
+        </Bound>
 
     </MathJaxContext>
   );

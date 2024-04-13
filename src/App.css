@@ -105,11 +105,22 @@ h1, h2, h3, h4, h5, h6 {
   --theme-color: #ff5900; /* Change this to your desired theme color */
   --theme-color-dark:rgb(65, 23, 0); /* Change this to your desired theme color */
 
-  --BACKGROUND1: rgb(0, 17, 65);
+  --BACKGROUND1: rgb(42, 42, 42);
   --BACKGROUND2: #ffffff;
   --patternWidth: 50px;
+  --BACKGROUND-PRIMARY: radial-gradient(circle, rgb(24, 24, 24) 50%, rgb(14, 14, 14) 100%);
 
   --background-outline: rgba(255, 255, 255, 0.227);
+}
+
+.section-title {  
+  font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}
+
+@media screen and (min-width: 500px) {
+  .RightPanel {
+    display: none;
+  }
 }
 
 @media screen and (max-width: 768px) {
@@ -154,10 +165,14 @@ h1, h2, h3, h4, h5, h6 {
       #dd000000;
 }
 .Header {
-  font-size: 20px;
-  background: var(--BACKGROUND2)
+  font-size: 10px;
+  font-family: Helvetica, Arial, sans-serif;
+  color: white;
+  background: var(--BACKGROUND1)
 }
-
+html, body {
+  background: black;
+}
 .MainContent {
   display: flex;
   width: 100%;
@@ -247,7 +262,7 @@ h1, h2, h3, h4, h5 {
 }
 
 .GeometrySelector {
-  margin-top: 20px;
+  margin: 20px;
   text-align: center;
   min-width: 200px;
   min-height: 150px;
@@ -269,6 +284,15 @@ h1, h2, h3, h4, h5 {
   height: 100%;
 }
 
+.SubgroupDiagram__button {
+  position: absolute;
+  aspect-ratio: 1; 
+  height: fit-content; 
+  padding: 40px 55px;
+  margin-left: 0px;
+  width: 50px;
+  box-shadow: 0 5px 0px 0px rgba(0, 0, 0, 0.155);
+}
 /* Se
 /* Button styling */
 .SelectorGroup button {
@@ -284,7 +308,7 @@ h1, h2, h3, h4, h5 {
 
   border-radius: 5px;
 
-  width: calc(max(15%, 25px));
+  width: max(15%, 38px);
   aspect-ratio: 1;
 
   border-radius: 5px;
@@ -324,12 +348,11 @@ h1, h2, h3, h4, h5 {
 
 /* Button styling for right panel */
 .RightPanel button {
-  margin: 5px;
-  padding: 10px 20px;
-  background-color: var(--theme-color);
+  margin: 8px;
+  padding: 10px 15px;
+  background-color: var(--theme-color-dark);
   color: #fff;
-  border: none;
-  border-radius: 30px; /* Rounded sides */
+  border-radius: 10%; /* Rounded sides */
   cursor: pointer;
 }
 html, body {
@@ -338,11 +361,10 @@ html, body {
 }
 
 html {
-  background-color: var(--theme-color-dark)!important;
+
 }
 body {
-  background: #ffffffc9;
-  backdrop-filter: opacity(0.05) brightness(10);
+  background: var(--BACKGROUND-PRIMARY)!important;
 }
 
 .MonoidInput-bottom {
@@ -381,18 +403,20 @@ body {
 .App_header {
   width: 100%;
   height: 50px;
-  background: rgb(255, 255, 255);
   /* a shadow that starts fully opaque at the top, then fades vertically */
   box-shadow: 0 0 10px 10px rgb(0, 0, 0);
   position: static;
 }
+.shapeName {
 
+}
 .MonoidInput-top {
   font-size: 40px;
   height: 80px;
   padding-left: 20px;
   background: #c8d6ba;
-  border: solid white;
+  margin-left: 10px;
+  margin-right: 10px;
   border-width: 0px 10px;
   box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.5) inset;
   color: #2f2f2f;
@@ -449,18 +473,15 @@ body {
   width: calc(max(50px, 84%));
 }
 .lineBorder {
-  border: 1px solid rgba(0, 0, 0, 0.4);
-  width: 100%;
+  border: solid rgba(0, 0, 0, 0.6);
+  border-width: 1px 1px 1px 1px;
 }
 .labelled {
   border-width: 10px;
   border-radius: 5px;
   border-style: solid;
-  box-shadow: 1px 1px  2px 2px rgba(0, 0, 0, 0.1) inset;
   border-color: #FFF0;/*#EEED #2223 #4443 #DDDD;*/
   background: transparent;
-  height: 100%;
-  width: 100%;
 }
 mjx-mrow > mjx-mo:first-child, mjx-mrow > mjx-mo:last-child {
   height: 150px;
@@ -518,7 +539,7 @@ mjx-mtd:not(:last-child) {
 }
 
 .LeftPanel,.RightPanel,.MiddlePanel {
-  
+  flex-direction: column;
 }
 
 .LeftPanel {
@@ -535,10 +556,9 @@ mjx-mtd:not(:last-child) {
   max-width: 800px;
   margin: 0 auto;
   pointer-events: all;
-  background: rgb(255, 255, 255);
 }
 .MiddlePanel > div {
-  min-width: 600px;
+  min-width: 400px;
 
 }
 
@@ -565,28 +585,40 @@ mjx-mtd:not(:last-child) {
   flex-grow: 0;
 }
 
-.MiddlePanel > div:first-child > div {
-  
-  width: 50%;
+.MiddlePanel > div:first-child > div:first-child {
+  width: 45%;
+}
+.MiddlePanel > div:first-child > div:last-child {
+  width: 55%;
 }
 .MidelPanel > div > *:last-child {
   margin-right: 0;
   margin-left: auto;
 }
 .RightPanel {
-
+  min-width: 300px;
   max-width: calc(min(20%, 400px));
 }
-
+.not-ready {
+  border: 2px dashed #0004;
+  background-color: #ffffffc0;
+  font-family: Helvetica, Arial, sans-serif;
+  font-weight: bold;
+  /* all caps */
+  text-transform: uppercase;
+  font-size: 40px;
+}
+.highlighted-vertex {
+  filter: drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5));
+}
 .label {
   font-size: 80%;
-    background: #ffffffde;
+    background: #ffffff;
   border-top-color: #FFFFFF;
   border-bottom-color: rgba(200, 200, 200, 20);
 border-width: 0.05cqw 0;
 border-radius: 10px;
 border-style: solid;  
-padding: 0px 3%;
   width: min-content;
   height: min-content;
 }
@@ -599,7 +631,7 @@ padding: 0px 3%;
 .SelectorGroup {
   position: relative;
   max-width: 400px;
-  padding: 20px;
+  padding: 0px;
   top: 0;
   background: transparent;
   display: flex;
@@ -610,11 +642,31 @@ padding: 0px 3%;
 }
 .SelectorGroup > div {
   width: 100%;
+  text-align: center;
 }
 .MainSelector__outer {
   pointer-events: all;
   z-index: 0;
-
+}
+.SectionTitle {
+  margin-top: 20px;
+  width: 100%;
+  text-transform: uppercase;
+  display: flex;
+}
+.vertexLabel {
+  height: 10px;
+  text-align: center;
+  align-content: center;
+}
+.SectionTitle > h3 {
+  font-weight: 500;
+  font-family: "Playfair Display", serif;
+}
+.SectionTitle__line {
+  flex-grow: 1;
+  height: 18px;
+  border-bottom: 1px solid #000;
 }
 .MainSelector_button {
   border-radius: 1px;
@@ -623,10 +675,13 @@ padding: 0px 3%;
 .SubgroupDiagram {
   width: 100%; 
   pointer-events: all;
-  aspect-ratio: 1, 
+  aspect-ratio: 1;
+  position: relative;
 }
-.SubgroupDiagram div:active {
-
+.SubgroupDiagram > div {
+  position: absolute;
+  width: 100%;
+  aspect-ratio: 1;
 }
 
 .SelectorComponent__outer {
@@ -666,6 +721,7 @@ foreignObject span > div {
   top: 0;
   height: 100%;
   z-index: 0;
+  align-content: center;
 }
 .ShapeDisplay > div {
 }
@@ -681,7 +737,7 @@ foreignObject span > div {
 }
 
 .SubgroupDiagram__holder {
-  background: rgb(255, 255, 255);
+
 }
 
 .SubgroupDiagram__holder > div {
@@ -707,7 +763,6 @@ foreignObject span > div {
 .SubgroupChoice__outer {
   display: flex;
   height: "30px";
-  background: white;
   width: 100%;
 }
 

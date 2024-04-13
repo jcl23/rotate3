@@ -1,26 +1,26 @@
 import { ReactComponentElement, SetStateAction, useEffect, useReducer, useRef, useState } from "react";
-import { SelectorComponent } from "./Selector";
+import { SelectorComponent } from "../Selector";
 import styleToCss from "style-object-to-css-string";
 
 import {NotificationContainer, NotificationManager} from 'react-notifications';
 import ReactHotkeys from "react-hot-keys";
 import { Vector2, Vector3 } from "three";
-import { StaticGraph } from "../StaticGraph";
-import { ActionSelectorComponent } from "./ActionSelector";
-import { VERTEX_ACTIVE, VERTEX_INACTIVE } from "../cfg/colors";
-import { CayleyGraphData, CayleyGraphVertex } from "../CayleyGraph";
-import { GeneratorSelector } from "./GeneratorSelector";
-import { validateCayleyGraph, determineGeneratorOrder, getElementOrder  } from "../logic/cayleyLogic";
+import { StaticGraph } from "./StaticGraph";
+import { ActionSelectorComponent } from "../ActionSelector";
+import { VERTEX_ACTIVE, VERTEX_INACTIVE } from "../../cfg/colors";
+import { CayleyGraphData, CayleyGraphVertex } from "./CayleyGraph";
+import { GeneratorSelector } from "../GeneratorSelector";
+import { validateCayleyGraph, determineGeneratorOrder, getElementOrder  } from "../../logic/cayleyLogic";
 
-import { GeometryName, GroupName } from "../DefaultMeshes";
-import groupData from "../data/groupData";
+import { GeometryName, GroupName } from "../../DefaultMeshes";
+import groupData from "../../data/groupData";
 
 
-import { GraphMatchingSelector } from "./GraphMatchingSelector";
+import { GraphMatchingSelector } from "../GraphMatchingSelector";
 import { set } from "firebase/database";
-import { SolidMonoids } from "../data/platonicsolids";
-import { cayleyGraphData } from "../data/cayleyGraphData";
-import subgroupsData from "../data/subgroupData";
+import { SolidMonoids } from "../../data/platonicsolids";
+import { cayleyGraphData } from "../../data/cayleyGraphData";
+import subgroupsData from "../../data/subgroupData";
 
 //cayleygraphdata type
 
@@ -65,6 +65,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
 
     const [vertices, setVerticesUnsafe] = useState<CayleyGraphVertex[]>([]); // initially load
     const [edges, setEdges] = useState<GraphEdge[][]>(Array(numGenerators).fill(0).map((_, i) => [] ));
+    const [highlighted, setHighlighted] = useState<number[]>([]);
     const [generatedEdges, setGeneratedEdges] = useState<GraphEdge[]>([]);
     const loadExample = () => {
         reset();
@@ -289,40 +290,20 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
         if (success) setVertexInd(newVertices.length - 1);
     }
 
-    const MOVEMENT_INTERVAL = 10;
+    const MOVEMENT_INTERVAL = 5;
     // a trivial useEffect to rerender the component when the data changes
     const moveLeft = () => move(-MOVEMENT_INTERVAL, 0);
     const moveRight = () => move(MOVEMENT_INTERVAL, 0);
     const moveUp = () => move(0, -MOVEMENT_INTERVAL);
     const moveDown = () => move(0, MOVEMENT_INTERVAL);
-    
+    const swapEdges = function() {
+        setEdges([edges[1], edges[0]])
+    }
     if (!show) return null;
-    let containerStyle = styleToCss({
-        position: "absolute",
-        top: 0, left: 0,
-        width: "100%", height: "100%",
-    });
-    
-    let outerStyle = styleToCss({
-        position: "absolute",
-        top: "50%", left: "50%",
-        transform: "translate(-50%, -50%)",
-        width: "50vw", height: "80vh",
-       
-        border: "1px solid black",
-        zIndex: 1,
-        padding: "30px",
-    })
+
 
     let buttonStyle = styleToCss({position: "fixed", right: "50px", top: "30px", border: "2px solid grey", padding: "5px", borderRadius: "5px", background: "#40a6f440"});
-    
-    // conctenate the style strings with extra lines between
-    let styleProps = {
-        CayleyGraphEditor__container: containerStyle,
-        CayleyGraphEditor__outer: outerStyle,
-        CayleyGraphEditor__button: buttonStyle,
-    }
-    // console.log(Object.entries(styleProps).map(([tagname, body]) => `.${tagname} {\n${body}\n}`).join("\n\n"));
+
     onkeydown = function(e: React.KeyboardEvent<HTMLDivElement>) {
         // switch on event key
    
@@ -434,6 +415,7 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
                         ))}
                     </div>
                 
+                    <button style={{padding:"10px"}} onClick={swapEdges}>Swap Edges</button>
 
                     <ActionSelectorComponent name={""} actions={{
                         ["Reflect (Y-axis)"]: reflectYAxis,
@@ -465,7 +447,8 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
                         subgroupName={groupName}  
                         edgeOrders={edgeOrders} 
                         edges={edges} 
-                        vertices={vertices} 
+                        vertices={vertices}
+                        setHighlighted={setHighlighted} 
                         setGeneratedEdges={setGeneratedEdges} 
                         setOutputString={setOutputString}
                     />
@@ -520,12 +503,14 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
                         const y = mainWidth / 200 * pos.y;
                         const x = mainWidth / 200 * pos.x;
                         let background = (i == vertexInd) ? VERTEX_ACTIVE : VERTEX_INACTIVE;
+                        const isHighlighted = highlighted.includes(i);
                         // Log whether arrow mode (with enthusiasm) or a different mode (in a sad tone)
                         if (mode === "Arrow") console.log("Arrow mode");
                         else console.log("Not arrow mode");
                         return (
                             <div 
-                            key={`CayleyGraphEditor__vertex[${i}]`}
+                                className={isHighlighted ? "highlighted-vertex" : undefined}
+                                key={`CayleyGraphEditor__vertex[${i}]`}
                                 onDrop={(e) => {  e.preventDefault();vertexDrop(i)}} 
                                 draggable={mode === "Arrow"} 
                                 onDragStart={(e) =>{ vertexDrag(i) }} 

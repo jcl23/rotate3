@@ -1,4 +1,4 @@
-import { EditorAction } from "./CayleyGraphEditor";
+import { EditorAction } from "./cayleygraph/CayleyGraphEditor";
 
 export type ActionSelectorData<ActionName extends string> = {
     name: string,
@@ -15,7 +15,6 @@ export function ActionSelectorComponent(data: ActionSelectorData<EditorAction>) 
         <button 
             onClick={actions[option]} 
             key={`SelectorComponent_option#${i}`}
-            style={{background:  "white" }}
         >
             {option.toString()}
         </button>

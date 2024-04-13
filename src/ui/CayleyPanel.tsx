@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { CayleyGraphData } from "../CayleyGraph"
+import { CayleyGraphData } from "./cayleygraph/CayleyGraph"
 import { IndexedFinExpMonoid } from "../monoid/IndexedMonoid"
 import { makeEmbeddedSubmonoid, makeSubmonoid } from "../monoid/makeMonoid";
 

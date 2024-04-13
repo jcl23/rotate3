@@ -8,9 +8,7 @@ export const Header = function() {
     return (
         <div className="Header">
             <h1>Subgroup Diagrams</h1>
-            <p>
-                This is a demonstration of the automorphism groups of regular polyhedra, particularly, the five platonic solids. Select a subgroup to focus on a particular sub-symmetry of the focused object. 
-            </p>
+            
         </div>
     );
 }

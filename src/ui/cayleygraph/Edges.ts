@@ -1,5 +1,5 @@
 import { CayleyGraphEdges } from "./CayleyGraph";
-import { IndexedFGM } from "./monoid/IndexedMonoid";
+import { IndexedFGM } from "../../monoid/IndexedMonoid";
 import { Monoid } from "./Monoid";
 
 export const makeEdges = function(monoid: IndexedFGM): CayleyGraphEdges {

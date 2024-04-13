@@ -1,6 +1,6 @@
 import { Vector2 } from "@react-three/fiber";
 import { Indexed, IndexedFGM } from "../monoid/IndexedMonoid";
-import { CayleyGraphData, CayleyGraphEdges, CayleyGraphVertex } from "../CayleyGraph";
+import { CayleyGraphData, CayleyGraphEdges, CayleyGraphVertex } from "../ui/cayleygraph/CayleyGraph";
 const data: CayleyGraphData[] = [
 
 ]

@@ -5,13 +5,13 @@ import { StyleHTMLAttributes, useEffect, useRef, useState } from "react";
 
 
 import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
-import { defaultShapes } from "./DefaultMeshes";
-import { ShapeProps, Step } from "./Shape";
+import { defaultShapes } from "../../DefaultMeshes";
+import { ShapeProps, Step } from "../../Shape";
 
-import { PTR_COLOR } from "./cfg/colors";
+import { PTR_COLOR } from "../../cfg/colors";
 import { Vector2, Vector3 } from "@react-three/fiber";
 import { animated, useSpring } from "react-spring";
-import defaultSpringConfig from "./cfg/springs";
+import defaultSpringConfig from "../../cfg/springs";
 import { MathComponent } from "mathjax-react";
 
 type CayleyGraphPointerProps = {
@@ -31,6 +31,8 @@ function useAnimatedPosition(position: { x: string; y: string }, style: Partial<
     top: y,
     config: defaultSpringConfig,
     position: "absolute",
+    paddingTop: "2px",
+    paddingBottom: "2px",
     transform: "translate(-50%, -50%)",
     width: `${style.width}`
   };
@@ -69,10 +71,11 @@ export const Pointer = function({ transform, text, width }: CayleyGraphPointerPr
    
     height: "6%",
     background: "transparent",
-    border: "2px solid black",
+    border: "3px solid black",
     width: `${width}px`,
-    borderRadius: '15px',
-    padding: `0px 3px`,
+    borderRadius: '10px',
+    padding: `2px 0px`,
+    boxShadow: "0px 0px 0px 1px #000000",
     // width: `${textRef.current?.getComputedStyle().width ?? 0}px`,
  };
  const position = transform.to;
@@ -80,13 +83,7 @@ export const Pointer = function({ transform, text, width }: CayleyGraphPointerPr
  console.log("STYLE:", animationProps.style.transform, animationProps.style.width)
  return (
   <>
-    <div className="Pointer" ref={textRef} style={{
-      fontSize: `1.75cqw`,
-      
-    }}>
-
-      <MathComponent  className={"tex2jax_process pointer"}  tex={text ?? "No text"}  />
-    </div> 
+  
    <animated.div {...animationProps} ref={frameRef} />
   </>
 

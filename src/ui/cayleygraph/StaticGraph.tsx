@@ -1,9 +1,9 @@
 import { Vector3 } from "three";
 import { CayleyGraphData, CayleyGraphEdges } from "./CayleyGraph";
-import { edgeColors, edgeHues } from "./cfg/colors";
+import { edgeColors, edgeHues } from "../../cfg/colors";
 import React, { MutableRefObject, SVGProps } from "react";
 import { MathComponent } from "mathjax-react";
-
+import Controls from "../../App";
 type StaticGraphProps = {
   graphData: CayleyGraphData;
   selected: number;
@@ -28,14 +28,19 @@ export const StaticGraph = function ({
     }
     let hue = edgeHues[generatorIndex % edgeColors.length];
     const color = `hsla(${hue}, 100%, ${50}%, 1)`;
-    const glassColor = `hsla(${hue}, 100%, ${70}%, 0.2)`;
+    const glassColor = `hsla(${hue}, 100%, ${80}%, 0.6)`;
     const div = document.createElement("div");
     const length = from.distanceTo(to);
     let slope = (to.y - from.y) / (to.x - from.x);
     if (slope === Infinity) slope = 1000000;
     // convert this to react style element
-
-    const arrowPosition = 0.45;
+    // const a = 0.0000223286;
+    // const b = -0.00513515
+    // const c = 0.849109;
+    const a=0.0000249331;
+    const b=-0.0056392;
+    const c=0.871474;
+    const arrowPosition = a * length ** 2 + b * length + c;
     const cx = from.x * arrowPosition + to.x * (1 - arrowPosition);
     const cy = from.y * arrowPosition + to.y * (1 - arrowPosition);
     
@@ -61,14 +66,19 @@ export const StaticGraph = function ({
     return (
       <>
       <polyline
+
+points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
+stroke={glassColor}
+strokeWidth={6}
+/>
+      <polyline
         markerMid={`url(#triangle${generatorIndex})`}
         vector-effect="non-scaling-stroke"
         points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
         stroke={color}
         strokeWidth={3}
         />
-{/**
- * 
+        {/* 
       <line
         x1={from.x + shiftX}
         y1={from.y + shiftY}
@@ -86,13 +96,9 @@ export const StaticGraph = function ({
         stroke={darkColor}
         strokeWidth={1.5}
       /> 
-      <polyline
+    */}
+      
 
-        points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
-        stroke={glassColor}
-        strokeWidth={6}
-        />
- */}
 
         </>
     );

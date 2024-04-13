@@ -1,4 +1,4 @@
-import { CayleyGraphProps } from "./CayleyGraph";
+import { CayleyGraphProps } from "./ui/cayleygraph/CayleyGraph";
 import { GeometryName } from "./DefaultMeshes";
 import subgroupData, { SubgroupData } from "./data/subgroupData";
 import subgroupDiagramData from "./data/subgroupDiagramData";

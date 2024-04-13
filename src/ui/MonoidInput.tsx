@@ -34,7 +34,7 @@ export const MonoidInput = function<T extends HasName & E3>({generators, monoidV
     const outString = `\\begin{aligned}\\textbf\{${sequenceString}\} &&\\mathbf\{= ${currentName}\}\\end{aligned}`;
     return (
         <div className='MonoidInput'>
-            <div className='MonoidInput-top' style={{display: "flex"}}>
+            <div className='MonoidInput-top lineBorder' style={{display: "flex"}}>
                 <div className='MonoidInput-sequence' style={{flexGrow: 1, flexBasis: "0px"}}>
                     <MemoizedMathJax  style={{ marginTop:"20px",   filter: "drop-shadow(0px 2px 1px #0004) drop-shadow(0px 2px 4px #EFE)"}} formula={outString}/>
                 </div>
@@ -42,7 +42,7 @@ export const MonoidInput = function<T extends HasName & E3>({generators, monoidV
             <div className='MonoidInput-bottom'>
                 <div className='MonoidInput__buttons lineBorder'>
                     <div  className='MonoidInput__generators'>
-
+                    <h5 className="section-title">GENERATORS</h5>
                     {generators.map((generator, i) => (
                         <button 
                         className='generator-button'
