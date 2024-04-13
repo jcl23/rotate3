@@ -29,6 +29,7 @@ const useIndexState = <T>(monoid: Monoid<T>): MonoidHookTriplet<T> => {
         });
     }
     // Return the state and custom setter
+
     return [{ currentElement, currentSequence }, append, reset];
 };
 

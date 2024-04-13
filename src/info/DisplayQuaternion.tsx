@@ -3,6 +3,7 @@
 import { MathJax } from "better-react-mathjax";
 import React, { ReactElement, useMemo, useState } from "react";
 import { Quaternion } from "three";
+import { SectionTitle } from "./SectionTitle";
 
 
 const decimalToExtendedReal = function( decimal: number, roots_adjoined: number[] ) {
@@ -85,7 +86,7 @@ console.log("Updated dict:", {dict})
 
 const QuaternionDisplay = {
     
-    ["matrix"]: function(q: Quaternion): ReactElement {
+    ["matrix"]: function(q: Quaternion, memo: Map<string, ReactElement>): ReactElement {
         let {w: w_raw, z: z_raw, x: x_raw, y: y_raw} = q;
         if (w_raw < 0) {
             w_raw = -w_raw;
@@ -93,13 +94,22 @@ const QuaternionDisplay = {
             y_raw = -y_raw;
             z_raw = -z_raw;
         }
-       // w, x, y, z, minusx, minusy, minusz
-       console.log({w_raw, x_raw, y_raw, z_raw})
-       console.log(query(-0))
+        // w, x, y, z, minusx, minusy, minusz
+        const key = `${x_raw.toFixed(3)}+${y_raw.toFixed(3)}+${z_raw.toFixed(3)}`;
+
+
+        if (false && memo && memo.has(key)) {
+            return memo.get(key);
+        }
+
+        const x_text = query(x_raw);
+        const y_text = query(y_raw);
+        const z_text = query(z_raw);
+
         const w = <td>{query(w_raw)}</td>;
-        const x = <td>{query(x_raw)}</td>;
-        const y = <td>{query(y_raw)}</td>;
-        const z = <td>{query(z_raw)}</td>;
+        const x = <td>{x_text}</td>;
+        const y = <td>{y_text}</td>;
+        const z = <td>{z_text}</td>;
 
 
         const minusx = <td>{query(-x_raw)}</td>;
@@ -112,11 +122,10 @@ const QuaternionDisplay = {
             [y, z, w, minusx],
             [z, minusy, x, w]
         ];
-        return (
-            <div style={{display: "inline-flex", height: "100%", paddingLeft: "10px", paddingRight: "10px"}}>
-            <div style={{height: "calc(100% - 20px)", width: "10px", marginTop: "3px", border: "solid black", borderWidth: "3px 0px 3px 3px", borderTopLeftRadius: "2.5px", borderBottomLeftRadius: "2.5px", marginRight: "-16px"}} />
-                
-            <table className={"DisplayQuaternion"} style={{ borderCollapse: "collapse", fontSize: "20px"}}>
+
+
+        const table = (
+            <table className={"QuaternionMatrix"} style={{ borderCollapse: "collapse", fontSize: "20px"}}>
                 <tr>
                     {matrix[0][0]}
                     {matrix[0][1]}
@@ -142,7 +151,16 @@ const QuaternionDisplay = {
                     {matrix[3][3]}
                 </tr>
             </table>
-            <div style={{height: "calc(100% - 20px)", width: "10px", marginTop: "3px", border: "solid black", borderWidth: "3px 3px 3px 0px", borderTopRightRadius: "2.5px", borderBottomRightRadius: "2.5px", marginLeft: "-16px"}} />
+        );
+
+        if (memo) memo.set(key, table);
+
+        return (
+            <div style={{display: "flex", height: "100%", paddingLeft: "10px", paddingRight: "10px"}}>
+                <div style={{ width: "10px", marginTop: "-3px", borderStyle: "solid", borderColor: "var(--TEXT)", borderWidth: "3px 0px 3px 3px", borderTopLeftRadius: "2.5px",  borderRight: "0px", borderBottomLeftRadius: "2.5px", marginRight: "-16px"}} />
+                {table}
+            
+            <div style={{width: "10px", marginTop: "-3px",  border: "3px solid var(--TEXT)", borderLeft: "0px",  borderTopRightRadius: "2.5px", borderBottomRightRadius: "2.5px", marginLeft: "-16px"}} />
             </div>
             )
             return String.raw`\begin{bmatrix}
@@ -150,10 +168,10 @@ const QuaternionDisplay = {
             ${matrix[1][0]} & ${matrix[1][1]} & ${matrix[1][2]} & ${matrix[1][3]} \\
             ${matrix[2][0]} & ${matrix[2][1]} & ${matrix[2][2]} & ${matrix[2][3]} \\
             ${matrix[3][0]} & ${matrix[3][1]} & ${matrix[3][2]} & ${matrix[3][3]}
-        \end{bmatrix}`;
+        \end{bmatrix}`
 
     },
-    ["quaternion"]: function(q: Quaternion): string {
+    ["quaternion"]: function(q: Quaternion): ReactElement  {
         
         // format like xi + yj + zk (we don't include w because it is a rotation)
         let {w: w_raw, z: z_raw, x: x_raw, y: y_raw} = q;
@@ -168,22 +186,22 @@ const QuaternionDisplay = {
         let x = query(x_raw);
         let y = query(y_raw);
         let z = query(z_raw);
-        let terms: string[] = [];
+        let terms: ReactElement[] = [];
         let notAlmostZero = (c: number) => Math.abs(c) > 0.0001;
         if (notAlmostZero(w_raw)) {
-            terms.push(`${w}`);
+            terms.push(<>{w}</>);
         }
         if (notAlmostZero(x_raw)) {
-            terms.push(`${x}i`);
+            terms.push(<>({x})i</>);
         }
         if (notAlmostZero(y_raw)) {
-            terms.push(`${y}j`);
+            terms.push(<>({y})j</>);
         }
         if (notAlmostZero(z_raw)) {
-            terms.push(`${z}k`);
+            terms.push(<>({z})k</>);
         }
-       
-        return String.raw`\[${terms.join(" + ")}\]`;  
+        const sum = terms.reduce((prev, curr) => <>{prev} + {curr}</>);
+        return <div style={{fontFamily: "Georgia", lineHeight: 2, fontSize: "120%"}}>{sum}</div>;
     },
     // temp
     ["orthogonal"]: function(q: Quaternion): string {
@@ -207,11 +225,21 @@ export const DisplayQuaternion = ({ quaternion, mode = "matrix" }: QuaternionDis
 
 
         // fractions: an array containing every fraction that is commonly used in representing rotations of degree 2, 3, 4, 5, or 6 in the complex plane.
-        
+    
+    const memo = new Map<string, ReactElement>();
+
     console.log({query});
         
-
-    return QuaternionDisplay[mode](quaternion);
+    const titles = {
+        "matrix": "Rotation Matrix",
+        "quaternion": "Quaternion",
+        "orthogonal": "Orthogonal",
+        "euler": "Euler",
+        "axis-angle": "Axis-Angle"
+    }
+    return <div style={{color: "var(--TEXT)", height: "calc(100% - 10px)"}}>
+        {QuaternionDisplay[mode](quaternion, memo)}
+    </div>
     console.log(outstr);
     return (
             

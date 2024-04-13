@@ -7,7 +7,7 @@ import { MathComponent } from "mathjax-react";
 export const Header = function() {
     return (
         <div className="Header">
-            <h1>Subgroup Diagrams</h1>
+            <h1>Rotation Groups and the 5 Platonic Solids</h1>
             
         </div>
     );

@@ -8,6 +8,7 @@ import { MathJax } from 'better-react-mathjax';
 import { MemoizedMathJax } from './MemoizedMathJax';
 import { E3 } from '../Display';
 import { edgeColors } from '../cfg/colors';
+import { SectionTitle } from '../info/SectionTitle';
 
 // takes a monoid with its generators, and creates an interactive UI with buttons for the generators, that then display a string of the current multiplication sequence, the result, and then an option to reset.
 // A type definition for types that have tostring.
@@ -67,7 +68,9 @@ export const MonoidInput = function<T extends HasName & E3>({generators, monoidV
             {/* 
             */}
             <div style={{marginLeft: "auto", height: "100%"}}>
-            <DisplayQuaternion quaternion={monoidValue.value.rotation} mode={Controls.controlVals.quaternionDisplayMode}/> 
+        <SectionTitle title={"Rotation Matrix"} />
+
+                <DisplayQuaternion quaternion={monoidValue.value.rotation} mode={Controls.controlVals.quaternionDisplayMode}/> 
                 </div>
             </div>
         </div>

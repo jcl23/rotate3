@@ -34,7 +34,7 @@ export const MainSelector = function ({
 }: MainSelectorProps) {
 
   const { geomName, subgroupName, conjugacyClassIndex, indexInClass } = appState;
-  const allShapeNames = ["Cube",  "Icosahedron","Tetrahedron", "Octahedron",  "Dodecahedron"]
+  const allShapeNames = ["Cube", "Icosahedron", "Tetrahedron", "Octahedron", "Dodecahedron"]
   // const [geometryName, setGeometryName] = useState<GeometryName>("Tetrahedron");
   const outerGroup = SolidMonoids[geomName];
 
@@ -55,64 +55,66 @@ export const MainSelector = function ({
   const defaultSubgroup = subgroupsData[outerGroup.name][defaultSubgroupName];
   return (
     <div className={className}>
-        <SectionTitle title="Geometry" />
+      <SectionTitle title="Geometry" />
       <div className="SelectorGroup">
-        <GeometrySelector setGeometry={function(givenGeomName) {
-              resetMonoid();
-            setAppState({
-              ...appState,
-              geomName: givenGeomName,
-              subgroupName: "1",
-              conjugacyClassIndex: 0,
-              indexInClass: 0,
-            });
-        }} geometry={geomName}/>
+        <GeometrySelector setGeometry={function (givenGeomName) {
+          resetMonoid();
+          setAppState({
+            ...appState,
+            geomName: givenGeomName,
+            subgroupName: "1",
+            conjugacyClassIndex: 0,
+            indexInClass: 0,
+          });
+        }} geometry={geomName} />
       </div>
       <SectionTitle title="Subgroup Class" />
 
       <div className="SelectorGroup">
-      <div className="SelectorComponent__outer">
-        {subgroupKeyNames.map((keyName, i) => {
-          const { displayName } = availableIsoClasses[keyName];
-          return (
-            <button className={keyName==subgroupName ? "selected" : null} onClick={() => {
-  
-              resetMonoid();
-              setAppState({
-                ...appState,
-                subgroupName: keyName,
-                conjugacyClassIndex: 0,
-                indexInClass: 0,
-              })
-            }} key={`SubgroupNameSelect#${i}`}>
-                <MemoizedMathJax formula={String.raw`\[${displayName}\]`}></MemoizedMathJax>
-                </button>
-        )})}
-      </div>
-      <SectionTitle title="Subgroup Instance" />
-
-      <div className="SelectorComponent__outer">
-        {
-          conjugacyClasses.map((conjugacyClass, i) => conjugacyClass.members.map((subgroup, j) => (
-              <button onClick={() => {
-
+        <div className="SelectorComponent__outer">
+          {subgroupKeyNames.map(function (keyName, i) {
+            const { displayName } = availableIsoClasses[keyName];
+            return (
+              <button className={keyName == subgroupName ? "selected" : undefined} onClick={() => {
                 resetMonoid();
-
                 setAppState({
                   ...appState,
-                  conjugacyClassIndex: i,
-                  indexInClass: j,
+                  subgroupName: keyName,
+                  conjugacyClassIndex: 0,
+                  indexInClass: 0,
                 })
-              }} key={`SubgroupSelect_option#${i}_${j}`}>
-                <MathJax dynamic>
-                  {subgroup.name.length ? subgroup.name : `(${i}, ${j})`}
+              }} key={`SubgroupNameSelect#${i}_${displayName}`}>
+                <MemoizedMathJax formula={String.raw`\[${displayName}\]`}></MemoizedMathJax>
+              </button>
+            )
+          })}
+        </div>
+        <SectionTitle title="Subgroup Instance" />
+
+        <div className="SelectorComponent__outer">
+          {
+            conjugacyClasses.map((conjugacyClass, i) => conjugacyClass.members.map((subgroup, j) => {
+
+              const isSelected = i == conjugacyClassIndex && j == indexInClass;
+              return (
+                <button className={isSelected ? "selected" : undefined}
+                  onClick={() => {
+                    resetMonoid();
+                    setAppState({
+                      ...appState,
+                      conjugacyClassIndex: i,
+                      indexInClass: j,
+                    })
+                  }} key={`SubgroupSelect_option#${i}_${j}`}>
+                  <MathJax dynamic>
+                    {subgroup.name.length ? subgroup.name : `(${i}, ${j})`}
                   </MathJax>
                 </button>
-            )
-          ))
-        }
-      </div>
-      {/**
+              )
+            }))
+          }
+        </div>
+        {/**
        * 
         <SelectorComponent name={"Subgroups"} options={availableIsoClassKeyList} selected={[subgroupName]} mode={"Value"} set={([el]) => setIsoClass(el)}/>
         <SelectorComponent name={"Conjugacy Classes"} options={conjugacyClasses.map(c => c.name)} selected={[conjugacyClassIndex]} mode={"Index"}  set={([el]) => setConjugacyClassIndex(el)} />

@@ -264,9 +264,7 @@ const subgroupsData: SubgroupRecord = {
                     name: "K_4",
                     displayName: String.raw`C_2^2`,
                     members: [
-                        { name: "", generators: [12, 8] },
-                        { name: "", generators: [8, 7] },
-                        { name: "", generators: [7, 12] },
+                        { name: "", generators: [9, 10] },
                     ],
                 },
             ],

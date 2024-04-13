@@ -86,11 +86,6 @@ mjx-mtd:last-child {
   
 }
 
-
-h1, h2, h3, h4, h5, h6 {
-  font-family: Papyrus;
-  font-weight: 300;
-}
 .font {
   font-family: "Playfair Display", serif;
   font-optical-sizing: auto;
@@ -109,7 +104,7 @@ h1, h2, h3, h4, h5, h6 {
   --BACKGROUND2: #ffffff;
   --patternWidth: 50px;
   --BACKGROUND-PRIMARY: radial-gradient(circle, rgb(24, 24, 24) 50%, rgb(14, 14, 14) 100%);
-
+  --TEXT: white;
   --background-outline: rgba(255, 255, 255, 0.227);
 }
 
@@ -205,6 +200,8 @@ mjx-container{
 h1, h2, h3, h4, h5 {
   text-align: center;
   font-family: Helvetica, sans-serif;
+  color: white;
+  margin: 5px;
 }
 
 
@@ -330,7 +327,7 @@ h1, h2, h3, h4, h5 {
   box-shadow: 0 0px 0px 0px rgb(0, 0, 0);
   transform: translateY(5px);
 }
-.GeometryButton.selected, .SelectorComponent__outer > .selected {
+.GeometryButton.selected, .SelectorComponent__outer > .selected, .SubgroupDiagram .selected {
   filter: brightness(1.5);
 }
 /* Geometry button that is also selected */
@@ -456,7 +453,7 @@ body {
 }
 
 .fraction_top {
-  border-bottom:solid black 1px; display:inline-block; float:left;
+  border-bottom:solid var(--TEXT) 1px; display:inline-block; float:left;
   margin-bottom: 2px;
  
   line-height: 14px;
@@ -507,22 +504,22 @@ mjx-mtd:not(:last-child) {
   margin: 0px; 
 }*/
 
-.DisplayQuaternion {
+.QuaternionMatrix {
   max-height: min-content;
   max-width: 400px;
   height: 100%;
   padding: 30px;
 }
 
-.DisplayQuaternion::before {
+.QuaternionMatrix::before {
   width: 20px; content: "";
   height: 100%;
   background: rgb(66, 138, 239);
 }
-.DisplayQuaternion > tr {
+.QuaternionMatrix > tr {
 
 }
-.DisplayQuaternion > tr > td {
+.QuaternionMatrix > tr > td {
   width: 25%;
   margin-right: 0;
   margin-left: 0;
@@ -649,7 +646,7 @@ border-style: solid;
   z-index: 0;
 }
 .SectionTitle {
-  margin-top: 20px;
+  margin-top: 0px;
   width: 100%;
   text-transform: uppercase;
   display: flex;
@@ -660,13 +657,16 @@ border-style: solid;
   align-content: center;
 }
 .SectionTitle > h3 {
-  font-weight: 500;
-  font-family: "Playfair Display", serif;
+  font-weight: 200;
+  letter-spacing: 0.2em;
+  filter: drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5));
+  /*font-family: Playfair Display, serif; */
+  font-family: Helvetica, sans-serif;
 }
 .SectionTitle__line {
   flex-grow: 1;
   height: 18px;
-  border-bottom: 1px solid #000;
+  border-bottom: 1px solid #ffffff;
 }
 .MainSelector_button {
   border-radius: 1px;
@@ -774,7 +774,6 @@ foreignObject span > div {
 }
 
 .GroupInfo__holder {
-  background: white;
   height: 100%;
 }
 
@@ -853,11 +852,6 @@ foreignObject span > div {
 
     border-radius: 5px;
     background: #40a6f440;
-  }
-
-  h2, h3, h4, h5 {
-    margin: 5px;
-    color: black;
   }
 
   .notification-container {

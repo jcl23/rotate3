@@ -142,7 +142,7 @@ export const Shape = forwardRef(({ shape, transform }: ShapeProps, ref: any) => 
   const innerMatFace = useMemo(
     () =>
       new MeshStandardMaterial({
-        color: 0xcccccc,
+        color: 0xffffff,
         metalness: 0.4,
         roughness: 0.2,
         transparent: false,        

@@ -51,6 +51,7 @@ import { MemoizedMathJax } from "./ui/MemoizedMathJax.tsx";
 import { set } from "firebase/database";
 import { Bound } from "./error/Bound.tsx";
 import { SectionTitle } from "./info/SectionTitle.tsx";
+import { GroupDetails } from "./info/GroupDetails.tsx";
 export const Controls = {};
 type QuaternionDisplayMode = "orthogonal" | "matrix" | "euler" | "axis-angle";
 const mathJaxConfig = {
@@ -76,6 +77,7 @@ function App() {
 
   // The app controls
   const controlVals = useControls({
+    showCGInput: false,
     useAllValues: false,
     showSubgroupIndices: false,
     reindexForSubgroup: false,
@@ -249,10 +251,10 @@ function App() {
    
       <div style={{ width: "33%"}}>
               
-                  <div>
+                  {(controlVals.showCGInput) && (<div>
                   <CayleyPanel group={currentMonoid} />
                   </div>
-               
+                  )}
             </div>
 
       <div className="MainContent">
@@ -327,7 +329,7 @@ function App() {
              />
 
         </div>
-        <div className={"RightPanel"} style={{ display: "flex", justifyContent: "space-around", width: "40%" }}>
+        <div className={"RightPanel"} style={{ display: "flex", flexDirection: "row", justifyContent: "space-around", width: "40%" }}>
             <div style={{  }}>
               <div className="SubgroupDiagram__holder">
         <SectionTitle title="Subgroup Lattice" />
@@ -337,6 +339,7 @@ function App() {
                   poset={currentSubgroupDiagramData.poset}
                   positions={currentSubgroupDiagramData.positions}
                   active={indexInSubgroupDiagram}
+                  reset={() => setClassAndResetChoice(0)}
                   setActive={i => subgroupDiagramOnClick[i]()}
                   labels={currentSubgroupDiagramData.labels.map((_, index) =>
                     controlVals.showSubgroupIndices
@@ -355,13 +358,7 @@ function App() {
                 className="GroupInfo__holder"
                 style={{ marginTop: "auto", height: "10vh " }}
                 >
-                <h1>{subgroupName}</h1>
-                <p style={{ justifyContent: "space-around", display: "flex" }}>
-                  <span style={{ flexGrow: 2 }}>Order:</span>
-                  <span style={{ flexGrow: 1 }}>
-                    {currentMonoid.elements.length}
-                  </span>
-                </p>
+                <GroupDetails generators={generators} group={currentMonoid} />
               </div>
               <div>
                 

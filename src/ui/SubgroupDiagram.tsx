@@ -7,6 +7,7 @@ export type PosetDiagramComponentProps = {
     positions: [number, number][]; // x and y
     labels: string[];
     active: number;
+    reset: () => void;
     // react set state hook
     setActive: (n: number) => void;
 }
@@ -14,22 +15,22 @@ export type PosetDiagramComponentProps = {
 const root = document.querySelector(':root');
 const rs = getComputedStyle(root);
 export const SubgroupDiagramComponent = function(props: PosetDiagramComponentProps) {
-    const { size, poset, positions, labels, active, setActive  } = props;
+    const { size, poset, positions, labels, active, setActive, reset  } = props;
     const [localStepIndex, setLocalStepIndex] = useState(0);
-    
     let groups = positions.map(([x, y], index) => {
         const onClick = (e) => {
             console.log("Clicked:", index);
+            reset();
             setActive(index);
         }
-
+        const isSelected = index === active;
         // const color = index === active ? rs.getPropertyValue("--button-active"): rs.getPropertyValue("--button-inactive");
         return (
  
-                    <button key={`poset_element_${index}`} className={"SubgroupDiagram__button"} style={{ left: `calc(${x}% - 2pc)`, top: `calc(${y}% - 1.5pc)`, 
+                    <button key={`poset_element_${index}`} className={"SubgroupDiagram__button" + (isSelected ? " selected" : "")} style={{ left: `calc(${x}% - 2pc)`, top: `calc(${y}% - 1.5pc)`, 
                          }} onClick={(e) => onClick(e)}  xmlns="http://www.w3.org/1999/xhtml" >
                             <MathComponent className={"tex2jax_process"}  style={{height:"100%", width: "100%", background: "transparent"}} tex={"" + ( labels[index] ?? index + 1)} />
-                        {/* <span>
+                    {/* <span>
                         </span>
                          */}
                     </button>
