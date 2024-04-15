@@ -65,7 +65,7 @@ let groupData = {
 
 let S3Els = groupData["D_8"].elements;
 if (S3Els) {
-    console.log("S_3 elements: ", S3Els.length);
+    // // console.log("S_3 elements: ", S3Els.length);
 }
 
 export default groupData;

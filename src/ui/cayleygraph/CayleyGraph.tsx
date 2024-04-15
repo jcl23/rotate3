@@ -94,7 +94,7 @@ if (status == false) return <div
   // get the current width of the selected vertex, by navigating down from graphRef.
   const refObj = graphRef.current;
   const width = refObj ? refObj.getBoundingClientRect().width : 28;
-  console.log({current: graphRef.current})
+  // console.log({current: graphRef.current})
   useEffect(() => {
     if (
       vertexDistance(indexedStep.to, monoidElementToPosition(currentIndex)) < 0.001
@@ -104,23 +104,18 @@ if (status == false) return <div
       from: indexedStep.to,
       to: monoidElementToPosition(currentIndex),
     });
-    console.log(
+    /* console.log(
       "reporting from CayleyGraph: current index is",
       currentIndex,
       "current value is",
       value
-    );
+    );*/
   }, [currentIndex, vertices]);
 
   /* Three stuff
    */
 
   const stableComponent = useMemo(() => {
-    console.log(
-      "%c refresh",
-      `font-size: 1.5em; color: ${~~(Math.random() * 16 ** 6).toFixed(16)};`
-    );
-
     return <Pointer width={width ?? 0} transform={temp_map(indexedStep)} text={vertices[currentIndex].name} />;
   }, [indexedStep, currentIndex]);
 
@@ -136,7 +131,7 @@ if (status == false) return <div
   const getVertexStyleData = () => {
     // at the ref, the circle inside the group
     const circle = graphRef.current?.children[0];
-    console.log("circle", circle);
+    // console.log("circle", circle);
   };
   
   const VertexDisplay = ({vertex}) => {

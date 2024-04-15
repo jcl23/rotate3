@@ -60,7 +60,7 @@ export const  GraphMatchingSelector = function ({ mainGroup, shapeName, subgroup
   });
   
   
-  console.log("GRAPHMATCHINGSELECTOR", subgroup.elements)
+  // console.log("GRAPHMATCHINGSELECTOR", subgroup.elements)
   const indexedSubgroup = indexMonoid(subgroup);
   if (localSubgroupData === undefined) {
     throw new Error(`[ GraphMatchingSelector ] Subgroup is undefined`);
@@ -83,7 +83,7 @@ export const  GraphMatchingSelector = function ({ mainGroup, shapeName, subgroup
       const record = monoidToOrderRecord(group);
      
       const choicesByEdgeIndex = edgeOrders.map(order => record[order]);
-      console.log({group});
+      // console.log({group});
   }, [groupName])
   */
 
@@ -201,7 +201,7 @@ export const  GraphMatchingSelector = function ({ mainGroup, shapeName, subgroup
     const phiInverse = new Map<number,number>();
     for (let i = 0; i < subgroup.elements.length; i++) phiInverse.set(phi.get(i), i);
     const newVertices: CayleyGraphVertex[] = [];
-    console.log({phi, phiInverse})
+    // console.log({phi, phiInverse})
     for (let i = 0; i < phi.size; i++) {
       const vertexIndex = phi.get(i);
       if (vertexIndex === undefined) {
@@ -217,11 +217,11 @@ export const  GraphMatchingSelector = function ({ mainGroup, shapeName, subgroup
       if(image === undefined) throw new Error(`[ GraphMatchingSelector ] image is undefined`);
       return newVertices[image];
     }
-    console.log(phi);
+    // console.log(phi);
     if (phi.size != subgroup.elements.length/*!areSame*/) {
       throw new Error(`[ GraphMatchingSelector ] subgroup and graphMonoid are not the same`);
     } else {
-      console.log(`[ GraphMatchingSelector ] subgroup and graphMonoid are the same`);
+      // console.log(`[ GraphMatchingSelector ] subgroup and graphMonoid are the same`);
     }
 
     if (graphMonoid.elements.length != vertices.length) {

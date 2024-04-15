@@ -59,7 +59,7 @@ export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: num
     }
     const returnMonoid =  indexMonoid(monoid, 0.01);
 
-    console.log(`Monoid for ${geom.type} of size: `, returnMonoid.elements.length);
+    // console.log(`Monoid for ${geom.type} of size: `, returnMonoid.elements.length);
     return returnMonoid;
 }
 
@@ -122,7 +122,7 @@ export const makeEmbeddedSubmonoid = function<T>(m: IndexedFGM<T>, generators: I
         elements: values,
         cayleyTable: cayleyTable ?? m.cayleyTable
     }
-    console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
+    // console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
      return monoid;
 }
 type HasName = { name: string };
@@ -150,9 +150,9 @@ export const compressElementName = function(name: string) : string {
             count = 1;
         }
     }
-    console.log( "Before", newName, parsed[parsed.length - 1], count)
+    // console.log( "Before", newName, parsed[parsed.length - 1], count)
     newName += render(parsed[parsed.length - 1], count)
-    console.log("after", newName);
+    // console.log("after", newName);
     
 
     return newName;
@@ -252,6 +252,6 @@ export const makeSubmonoid = function<T>(m: FinitelyGeneratedMonoid<T>, generato
         name: m.name,
         elements: values
     }
-    console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
+    // console.log("Generated submonoid of size: ", monoid.elements.length, " from ", generators.length, " generators.")
      return monoid;
 }

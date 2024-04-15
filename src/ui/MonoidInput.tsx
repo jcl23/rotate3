@@ -30,7 +30,7 @@ export const MonoidInput = function<T extends HasName & E3>({generators, monoidV
     
     let sequenceString = currentSequence.map(el => el.name).join('');
     if (sequenceString.length == 0) sequenceString += "e";
-    console.log({monoidValue});
+    // console.log({monoidValue});
     let currentName = monoidValue.name ?? labels?.[monoidValue.index] ?? monoidValue.index ?? "";
     const outString = `\\begin{aligned}\\textbf\{${sequenceString}\} &&\\mathbf\{= ${currentName}\}\\end{aligned}`;
     return (

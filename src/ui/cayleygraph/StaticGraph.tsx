@@ -63,17 +63,19 @@ export const StaticGraph = function ({
     const dark = (0.5 + 0.2 * dot) * 100;
     const brightColor = `hsl(${hue}, ${100}%, ${bright}%)`;
     const darkColor = `hsl(${hue}, ${100}%, ${dark}}%)`;
+    const key = "" + from.x + from.y + to.x + to.y;
     return ({
       
       back: <polyline
-
+        key={"SVGPolyline__" + key + "back"}
         points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
         stroke={glassColor}
         strokeWidth={6}
       />,
       front: <polyline
+      key={"SVGPolyline__" + key + "front"}
         markerMid={`url(#triangle${generatorIndex})`}
-        vector-effect="non-scaling-stroke"
+        vectorEffect="non-scaling-stroke"
         points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
         stroke={color}
         strokeWidth={2}

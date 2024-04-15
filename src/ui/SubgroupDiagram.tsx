@@ -19,7 +19,7 @@ export const SubgroupDiagramComponent = function(props: PosetDiagramComponentPro
     const [localStepIndex, setLocalStepIndex] = useState(0);
     let groups = positions.map(([x, y], index) => {
         const onClick = (e) => {
-            console.log("Clicked:", index);
+            // console.log("Clicked:", index);
             reset();
             setActive(index);
         }

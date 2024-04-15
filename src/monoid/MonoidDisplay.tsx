@@ -21,10 +21,10 @@ export type MonoidDisplayProps<T> = {
   setMonoidValue: SetAction<Indexed<T>>;
 };
 
-export function useMonoid = function<T> (monoid: IndexedMonoid<T>) {
+/* export function useMonoid = function<T> (monoid: IndexedMonoid<T>) {
   const [monoidValue, setMonoidValue] = useState(monoid.identity);
   return { monoidValue, setMonoidValue };
-}
+}*/
 export const FGIMonoidDisplay = function<T> ({
   // Responsible for managing 
   monoid,

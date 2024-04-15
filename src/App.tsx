@@ -1,8 +1,7 @@
 import {
-  SetStateAction,
-  useEffect,
+
   useLayoutEffect,
-  useRef,
+
   useState,
 } from "react";
 
@@ -25,7 +24,7 @@ import subgroupsData, {
 
 import { SubgroupChoice } from "./ui/SubgroupChoice.tsx";
 
-import { useControls } from "leva";
+
 import { labelMonoid, makeEmbeddedSubmonoid } from "./monoid/makeMonoid.ts";
 import { GeometryName, GroupName } from "./DefaultMeshes.tsx";
 import { CayleyGraphEditor } from "./ui/cayleygraph/CayleyGraphEditor.tsx";
@@ -41,7 +40,7 @@ import useMonoidState from "./hooks/useMonoidState.ts";
 import { MathJaxContext } from "better-react-mathjax";
 
 import { MemoizedMathJax } from "./ui/MemoizedMathJax.tsx";
-import { set } from "firebase/database";
+
 import { Bound } from "./error/Bound.tsx";
 import { SectionTitle } from "./info/SectionTitle.tsx";
 import { GroupDetails } from "./info/GroupDetails.tsx";
@@ -110,7 +109,7 @@ function App() {
   const groupName = SolidMonoids[geomName].name as GroupName;
   const currentMonoid = SolidMonoids[geomName];
   const result = enumeratePairs(currentMonoid);
-  console.log("EnumeratePairs", {result});
+  // console.log("EnumeratePairs", {result});
   // Which isomorphism class of subgroups to show (now safely)
 
   
@@ -129,7 +128,7 @@ function App() {
          });
       });
   });
-  console.log({allConjugacyClasses});
+  // console.log({allConjugacyClasses});
   const availableConjugacyClasses: ConjugacyClass[] =
     subgroupIsoClass.conjugacyClasses;
 
@@ -149,7 +148,7 @@ function App() {
   const namedGenerators = subgroupData.generators.map((i, j) => ({name: elementNames[j], el: currentMonoid.elements[i]}));
   const inverses = namedGenerators.map(({name, el}) => ({name: name + "^{-1}", el: findInverse(currentMonoid, el)})); 
   let labeledSubgroup;
-  console.log({currentMonoid})
+  // console.log({currentMonoid})
   if (controlVals.labelWithInverses)
   {
       labeledSubgroup = labelMonoid(subgroup, [...namedGenerators, ...inverses]);
@@ -158,10 +157,10 @@ function App() {
    }
   const labels = Object.fromEntries(labeledSubgroup.elements.map((el) => [el.index, el.name]));
   const labelList = labeledSubgroup.elements.map((el) => el.name);
-  console.log("Attempted submonoid labelling", {labels});
+  // console.log("Attempted submonoid labelling", {labels});
 
   labeledSubgroup.elements.forEach((el) => {
-      console.log(el.name, el.index);
+      // console.log(el.name, el.index);
    });
    const [{currentElement: monoidValue, currentSequence}, appendMonoidValue, resetMonoid] = useMonoidState(labeledSubgroup);
   // bconst currentGroupName = subgroup.name;
@@ -184,7 +183,7 @@ function App() {
     // enumerateOrbits(currentMonoid);
   }, [geomName]);
   
-  console.log("subgroupName: ", subgroupName);
+  // console.log("subgroupName: ", subgroupName);
 
 
   const generators = labeledSubgroup.generators;

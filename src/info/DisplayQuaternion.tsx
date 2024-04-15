@@ -16,7 +16,7 @@ const decimalToExtendedReal = function( decimal: number, roots_adjoined: number[
 
     const roots = roots_adjoined.map((root) => Math.sqrt(root));
     let maxOut2 = maxOut / roots[0];
-    console.log("from decimalToExtended real: Roots:", roots);
+    // console.log("from decimalToExtended real: Roots:", roots);
     let close = (j: number, k: number) => Math.abs(j - k) < 0.0001;
     for (let a = -maxOut; a <= -maxOut; a++) {
         for (let b = -maxOut2; b <= maxOut2; b++) {
@@ -130,7 +130,7 @@ for (let root of roots) {
         }
     }
 }
-console.log("Updated matrixDict:", {matrixDict})
+// console.log("Updated matrixDict:", {matrixDict})
 
 const QuaternionDisplay = {
     
@@ -278,7 +278,7 @@ export const DisplayQuaternion = ({ quaternion, name,  mode = "matrix", ...props
     
     const memo = new Map<string, ReactElement>();
 
-    console.log({query});
+    // console.log({query});
     let style = {};
     if (props.style) {
         // create new object based on props.style, copy the stuff over
@@ -297,7 +297,7 @@ export const DisplayQuaternion = ({ quaternion, name,  mode = "matrix", ...props
     return <div style={style}>
         {QuaternionDisplay[mode](quaternion, memo, name)}
     </div>
-    console.log(outstr);
+    // console.log(outstr);
     return (
             
                 <table>

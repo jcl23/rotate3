@@ -100,9 +100,9 @@ export const Shape = forwardRef(({ shape, generators, transform, secondary }: Sh
   });
   /*useEffect(() => {
       console.log("fromRotation", transform.from.rotation.toArray().toString());
-      console.log("toRotation", transform.to.rotation.toArray().toString());
-      console.log("fromPosition", transform.from.position.toString());
-      console.log("toPosition", transform.to.position.toString());
+      // console.log("toRotation", transform.to.rotation.toArray().toString());
+      // console.log("fromPosition", transform.from.position.toString());
+      // console.log("toPosition", transform.to.position.toString());
     }, [transform])*/
   // return the jsx
   let geo: THREE.BufferGeometry;
@@ -246,7 +246,7 @@ export const Shape = forwardRef(({ shape, generators, transform, secondary }: Sh
             const dx = i % 3 - 1;
             const dy = Math.floor(i / 3) % 3 - 1;
             const dz = Math.floor(i / 9) % 3 - 1;
-            console.log([dx, dy, dz])
+            // console.log([dx, dy, dz])
             const shift = new Vector3(dx, dy, dz).multiplyScalar(0.03);
             r.set(start.clone().add(shift), axis.clone().add(shift).normalize());
             const newIntersects = r.intersectObject(mesh);
@@ -259,7 +259,7 @@ export const Shape = forwardRef(({ shape, generators, transform, secondary }: Sh
                 const normCoords = new Float32Array(intersect.normal?.toArray());
                 const quickHash = normCoords[0].toPrecision(3) + 256 * normCoords[1].toPrecision(3) + 65536 * normCoords[2].toPrecision(3);
                 normalSet.add(quickHash);
-                console.log('quickHash', quickHash);
+                // console.log('quickHash', quickHash);
                 intersects.push(intersect);
               }
             }
@@ -268,7 +268,7 @@ export const Shape = forwardRef(({ shape, generators, transform, secondary }: Sh
          const numNormals = normalsSeen.length;
          const type = numNormals == 1 ? "Face" : numNormals == 2 ? "Edge" : "Vertex";
          const nearestPointsCount = numNormals;
-         console.log({nearestPointsCount})
+         // console.log({nearestPointsCount})
          // calculate the nearest numNormals points.
 
         // colorAttribute.setXYZ(face.b, color.r, color.g, color.b);

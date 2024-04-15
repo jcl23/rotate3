@@ -58,12 +58,12 @@ export const Pointer = function({ transform, text, width }: CayleyGraphPointerPr
     config: { mass: 1, tension: 170, friction: 26, precision: 0.001 },
   });
   
-  console.log(transform, x, y);
+  // console.log(transform, x, y);
   */
- console.log("Container", textRef.current);
+ // console.log("Container", textRef.current);
  let currentWidth = textRef.current?.firstChild.firstChild.firstChild.width?.animVal?.value ?? 0;
  /*useEffect(() => {
-    console.log("Container", textRef.current);
+    // console.log("Container", textRef.current);
     currentWidth = textRef.current?.firstChild?.firstChild?.firstChild?.width?.animVal?.value ?? 0;
   }, [textRef.current?.firstChild?.firstChild?.firstChild]);
   */
@@ -80,7 +80,7 @@ export const Pointer = function({ transform, text, width }: CayleyGraphPointerPr
  };
  const position = transform.to;
  const animationProps = useAnimatedPosition(position, style);
- console.log("STYLE:", animationProps.style.transform, animationProps.style.width)
+ // console.log("STYLE:", animationProps.style.transform, animationProps.style.width)
  return (
   <>
   

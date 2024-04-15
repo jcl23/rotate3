@@ -18,7 +18,7 @@ export const makeEdges = function(monoid: IndexedFGM): CayleyGraphEdges {
                     (() => product.index)(),
                 ];
             } catch (e) {
-                console.log("error", {edges}, {generator}, {value}, edges[generator.index].length.toString());
+                // console.log("error", {edges}, {generator}, {value}, edges[generator.index].length.toString());
                 throw e;
             }
         }

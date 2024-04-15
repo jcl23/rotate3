@@ -56,7 +56,7 @@ const determineGeneratorOrder = function(edges: [number, number][]): number {
     while (i <= edges.length && i < 20) {
         i++;
         const [_, to] = edgeFrom(currentVertex) ?? [0, 0];
-        console.log(`$[i]: ${currentVertex} -> ${to}]`)
+        // console.log(`$[i]: ${currentVertex} -> ${to}]`)
         currentVertex = to;
         if (currentVertex == 0) break;
     }

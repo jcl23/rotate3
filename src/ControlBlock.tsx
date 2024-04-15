@@ -91,7 +91,7 @@ export const ControlBlock = function ({ children, title, shape, generators }: Co
                         onClick={() => {
                            setPosition(new Vector3().addVectors(transform.position, vd));
                            setStepIndex(stepIndex + 1);
-                           console.log("move!", transform.position );
+                           // console.log("move!", transform.position );
                         }}
                         >
                         {vd.toArray().toString()}

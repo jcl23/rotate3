@@ -21,7 +21,7 @@ export const CameraControls = function ({ setCameraType }: CameraControlsProps) 
                         <button
                         onClick={() => {
                             setCameraType(_cameraType);
-                            console.log("call!", _cameraType);
+                            // console.log("call!", _cameraType);
                         }}
                         >
                         {_cameraType}

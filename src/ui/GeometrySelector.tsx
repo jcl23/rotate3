@@ -19,8 +19,6 @@ export const GeometrySelector = function({ setGeometry, geometry }: GeometrySele
         {left: "100%", top: "50%"},
         {left: "50%", top: "100%"}
         */
-        // ^ This is wrong, the X is the wrong way. There should include one that's like left 0 top 0.
-        // The X should be like:
         // 1 0 1
         // 0 1 0
         // 1 0 1
@@ -49,35 +47,35 @@ export const GeometrySelector = function({ setGeometry, geometry }: GeometrySele
     let shapes = {
 
         Tetrahedron: <svg viewBox="0 0 200 200" width="50" height="50">
-        <polygon points="100,0 187,150 12,150" fill="none" stroke={strokeColor} stroke-width={strokeWidth} />
+        <polygon points="100,0 187,150 12,150" fill="none" stroke={strokeColor} strokeWidth={strokeWidth} />
         {/* points from the vertices to center */}
-        <line x1="100" y1="0" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} /> 
-        <line x1="187" y1="150" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-        <line x1="12" y1="150" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
+        <line x1="100" y1="0" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} /> 
+        <line x1="187" y1="150" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+        <line x1="12" y1="150" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
         </svg>,
   
         Cube: <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-          <rect x="50" y="50" width="100" height="100" fill="none" stroke={strokeColor} stroke-width={strokeWidth} />
-          <line x1="0" y1="0" x2="50" y2="50" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="200" y1="0" x2="150" y2="50" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="0" y1="200" x2="50" y2="150" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="200" y1="200" x2="150" y2="150" stroke={strokeColor} stroke-width={strokeWidth} />
+          <rect x="50" y="50" width="100" height="100" fill="none" stroke={strokeColor} strokeWidth={strokeWidth} />
+          <line x1="0" y1="0" x2="50" y2="50" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="200" y1="0" x2="150" y2="50" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="0" y1="200" x2="50" y2="150" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="200" y1="200" x2="150" y2="150" stroke={strokeColor} strokeWidth={strokeWidth} />
             </svg>,
         Icosahedron: <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
            { // a regular pentagon  with lines from the vertices to the middle. It should be exactly regular and centered.
            }
-            <polygon points={icoPts} fill="none" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="100" y1="0" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="200" y1="75" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="160" y1="190" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="40" y1="190" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="0" y1="75" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
+            <polygon points={icoPts} fill="none" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="100" y1="0" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="200" y1="75" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="160" y1="190" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="40" y1="190" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="0" y1="75" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
         </svg>,
         Dodecahedron: <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-            <polygon points={dodecaPts} fill="none" stroke={strokeColor} stroke-width={strokeWidth} />
+            <polygon points={dodecaPts} fill="none" stroke={strokeColor} strokeWidth={strokeWidth} />
            {/* Lines extending straight outward from the vertices to the border */}
             {
-                dodecaLines.map((line, i) => <line {...line} stroke={strokeColor} stroke-width={strokeWidth} />)
+                dodecaLines.map((line, i) => <line key={"DodecaLine" + i} {...line} stroke={strokeColor} strokeWidth={strokeWidth} />)
             }
             
             {/* Lines extending from the vertices to the center */}
@@ -85,12 +83,12 @@ export const GeometrySelector = function({ setGeometry, geometry }: GeometrySele
             </svg>,
         Octahedron: <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
             {/* Square with vertices on the circle radius 100 */}
-            <rect x="29" y="29" width="141" height="141" fill="none" stroke={strokeColor} stroke-width={strokeWidth} />
+            <rect x="29" y="29" width="141" height="141" fill="none" stroke={strokeColor} strokeWidth={strokeWidth} />
             {/* Lines from the vertices to the center */}
-            <line x1="29" y1="29" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="171" y1="29" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="171" y1="171" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
-            <line x1="29" y1="171" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
+            <line x1="29" y1="29" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="171" y1="29" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="171" y1="171" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
+            <line x1="29" y1="171" x2="100" y2="100" stroke={strokeColor} strokeWidth={strokeWidth} />
             </svg>
 
           

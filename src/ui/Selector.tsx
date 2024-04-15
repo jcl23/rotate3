@@ -13,14 +13,14 @@ export type SelectorData<T> = {
 
 export function SelectorComponent<T extends { toString: () => string } | number>(data: SelectorData<T>) {
     const {options, selected, set, mode, name, outerProps = {} } = data;
-    console.log("SelectorComponent:", data);
+    // console.log("SelectorComponent:", data);
     let elements;
     if (mode == "Value") {
         elements = options.map((option, i) => (
             <button 
                 onClick={
                     () => {
-                        console.log("Calling set on", [option]);
+                        // console.log("Calling set on", [option]);
                         set([option]) 
                     }
                 } 

@@ -101,11 +101,11 @@ export const ShapeDisplay = function ({
         rotation.equals(transformStep.to.rotation) &&
         position.equals(transformStep.to.position)
       ) {
-        console.log("Returned the same rotation")
+        // console.log("Returned the same rotation")
         return;
       } else {
       }
-      console.log("Setting the rotation");
+      // console.log("Setting the rotation");
       setTransformStep({
         from: transformStep.to,
         to: { rotation, position },
@@ -119,7 +119,7 @@ export const ShapeDisplay = function ({
     }, [shape])
     let dummy;
     const stableShape = useMemo(() => {
-      console.log("ShapeDisplay ()", shape);  
+      // console.log("ShapeDisplay ()", shape);  
       return (
         <>
             <Shape ref={shapeRef} shape={shape} generators={generators} secondary={secondaryShape ?? ""} transform={transformStep}  />
@@ -188,10 +188,10 @@ export const ShapeDisplay = function ({
                 
               {stableShape}
               {generators.map(({value: {rotation}}) => rotation).map(quaternionToAxis(6), { lineWidth: 4 }).map((data, i) => { 
-                return ( <>
+                return ( 
                     <primitive key={`ShapeDisplay_prim[${i}]`} object={data} />
                     
-                  </>
+                  
                 )
               })}
               {children}

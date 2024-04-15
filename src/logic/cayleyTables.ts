@@ -68,7 +68,7 @@ export const  enumerateTransforms = function<T>(monoid: FinitelyGeneratedMonoid<
         }
         queue = newQueue;
     }
-    console.log("Monoid of size: ", valueSet.length);
+    // console.log("Monoid of size: ", valueSet.length);
 
     // cayleyTable = cayleyTable.slice(0, valueList.length).map((row) => row.slice(0, valueList.length));
     return [...valueSet];

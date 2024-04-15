@@ -69,7 +69,7 @@ const makeHomomorphism = function<A, B>(m: IndexedFM<A>, n: Monoid<B>, generator
         }
         queue = newQueue;
     }
-    console.log(history);
+    // console.log(history);
     
     return map;
 }

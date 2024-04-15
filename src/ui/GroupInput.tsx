@@ -28,10 +28,10 @@ type GroupInputProps<T> = {
 }
 
 export const GroupInput = function<T extends HasName & E3>({generators, monoidValue, labels, currentSequence, append, reset, m}: GroupInputProps<T>) {
-    console.log(currentSequence);
+    // console.log(currentSequence);
     let longSequenceString = currentSequence.map(el => el.name).join('');
     if (longSequenceString.length == 0) longSequenceString += "e";
-    console.log({monoidValue});
+    // console.log({monoidValue});
     let currentName = monoidValue.name ?? labels?.[monoidValue.index] ?? monoidValue.index ?? "";
     let sequenceString = compressElementName(longSequenceString);
     const outString = `\\begin{aligned}\\mathbf\{${sequenceString}\} &&\\mathbf\{= ${currentName}\}\\end{aligned}`;
