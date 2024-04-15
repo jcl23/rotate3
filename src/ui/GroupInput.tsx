@@ -95,7 +95,7 @@ export const GroupInput = function<T extends HasName & E3>({generators, monoidVa
 
     return (
         <div className='GroupInput'>
-            <div className='MonoidInput-top lineBorder' style={{display: "flex"}}>
+            <div className='MonoidInput-top' style={{display: "flex"}}>
                 <div className='GroupInput-sequence' style={{flexGrow: 1, flexBasis: "0px"}}>
                     <MemoizedMathJax  style={{ marginTop:"20px",   filter: "drop-shadow(0px 1px 4px #111)"}} formula={outString}/>
                 </div>
@@ -105,7 +105,7 @@ export const GroupInput = function<T extends HasName & E3>({generators, monoidVa
                    <div className='GroupInput'>
  
                 </div>
-                : <div className='GroupInput__buttons lineBorder'>
+                : <div className='GroupInput__buttons'>
                 <SectionTitle title={"Generators"} />
                 <div  className='GroupInput__generators'>
                     {buttonSet}
@@ -114,7 +114,7 @@ export const GroupInput = function<T extends HasName & E3>({generators, monoidVa
                 </div>
             }         
 
-            <div style={{marginLeft: "auto", height: "calc(100% - 50px)",  paddingTop: "6px"}}>
+            <div style={{marginLeft: "auto", height: "calc(100% - 50px)",  paddingTop: "5px"}}>
                 <SectionTitle title={"Rotation Matrix"} />
 
                 <DisplayQuaternion quaternion={monoidValue.value.rotation} mode={Controls.controlVals.quaternionDisplayMode}/> 

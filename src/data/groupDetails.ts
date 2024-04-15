@@ -81,7 +81,7 @@ export const groupDetails: Record<GroupName, GroupDetails> = {
         rank: 2
     },
     D_10: {
-        name: "D_10",
+        name: "D_{10}",
         abstract: "The dihedral group of order 10.",
         order: 10,
         rank: 2

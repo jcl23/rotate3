@@ -368,7 +368,7 @@ const subgroupsData: SubgroupRecord = {
     Tetrahedron: {
         1: {
             name: "1",
-            displayName: "",
+            displayName: "1",
             shape: "None",
             conjugacyClasses: [
                 {
@@ -424,14 +424,7 @@ const subgroupsData: SubgroupRecord = {
                         { name: "E_{2,3}", generators: [10, 11] },
                         { name: "E_{1,3}", generators: [9, 11] },
                     ],
-                },
-                {
-                    name: "K_4",
-                    displayName: String.raw`C_2^2`,
-                    members: [
-                        { name: "", generators: [9, 10] },
-                    ],
-                },
+                }
             ],
         },
         A_4: {
@@ -449,7 +442,7 @@ const subgroupsData: SubgroupRecord = {
     Icosahedron: {
         1: {
             name: "1",
-            displayName: "",
+            displayName: "1",
             conjugacyClasses: [
                 {
                     name: "1",
@@ -612,7 +605,7 @@ const subgroupsData: SubgroupRecord = {
     Dodecahedron: {
         1: {
             name: "1",
-            displayName: "",
+            displayName: "1",
             conjugacyClasses: [
                 {
                     name: "1",
@@ -682,7 +675,7 @@ const subgroupsData: SubgroupRecord = {
                         { name: "V_7", generators: [ 7 ] },
                         { name: "V_8", generators: [ 8 ] },
                         { name: "V_9", generators: [ 9 ] },
-                        { name: "V_10", generators: [ 10 ] },
+                        { name: "V_{10}", generators: [ 10 ] },
                        
                     ],
                 },

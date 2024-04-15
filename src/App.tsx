@@ -70,7 +70,7 @@ function App() {
   // const [cameraType, setCameraType] = useState<CameraType>("front-facing");
 
   // The app controls
-  const controlVals = useControls({
+  const controlVals = {
     showCGInput: false,
     useAllValues: false,
     showSubgroupIndices: false,
@@ -78,16 +78,19 @@ function App() {
     showCayleyGraph: true,
     strictIndices: false,
     labelWithInverses: false,
-    cameraType: {
-      options: ["perspective" ],
-    },
-    quaternionDisplayMode: {
-      options: [ "matrix", "orthogonal", "euler", "axis-angle", "quaternion"]
-    },
-    vertexNames: {
-      options: [ "all", "selected", "none"]
-    }
-  });
+    cameraType: "perspective",
+    quaternionDisplayMode: "matrix",
+    vertexNames: "all",
+  };
+  //cameraType: {
+  //  options: ["perspective" ],
+  // quaternionDisplayMode: {
+  // },
+  //   options: [ "matrix", "orthogonal", "euler", "axis-angle", "quaternion"]
+  // },
+  // vertexNames: {
+  //   options: [ "all", "selected", "none"]
+  // }
   Controls.controlVals = controlVals;
   const geomNameList = Object.keys(SolidMonoids) as GeometryName[];
   const defaultGeomName = geomNameList[3]; // Octahedron
@@ -341,6 +344,7 @@ function App() {
                     : allConjugacyClasses[index].displayName
                     )}
                     />
+                    
                 <SubgroupChoice
                   choiceIndex={indexInClass}
                   setChoiceIndex={(i) => { setState({...state, indexInClass: i}); resetMonoid(); }}
@@ -352,7 +356,7 @@ function App() {
                 className="GroupInfo__holder"
                 style={{ marginTop: "auto", height: "10vh " }}
                 >
-                <GroupDetails generators={generators} group={currentMonoid} />
+                <GroupDetails generators={generators} group={labeledSubgroup} />
               </div>
               <div>
                 

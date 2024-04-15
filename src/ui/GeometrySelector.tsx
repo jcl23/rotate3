@@ -74,7 +74,6 @@ export const GeometrySelector = function({ setGeometry, geometry }: GeometrySele
             <line x1="0" y1="75" x2="100" y2="100" stroke={strokeColor} stroke-width={strokeWidth} />
         </svg>,
         Dodecahedron: <svg width="200" height="200" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
-            {/* TO COPILOT: a slightly smaller regular pentagon (five sides), beginning with a point (100, 20), but with lines extending from the vertices OUTWARDS at equal angles from either side */ }
             <polygon points={dodecaPts} fill="none" stroke={strokeColor} stroke-width={strokeWidth} />
            {/* Lines extending straight outward from the vertices to the border */}
             {

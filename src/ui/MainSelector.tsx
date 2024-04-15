@@ -106,9 +106,9 @@ export const MainSelector = function ({
                       indexInClass: j,
                     })
                   }} key={`SubgroupSelect_option#${i}_${j}`}>
-                  <MathJax dynamic>
-                    {subgroup.name.length ? subgroup.name : name}
-                  </MathJax>
+               
+                    {subgroup.name.length ? <MemoizedMathJax formula={`\\[${subgroup.name}\\]`} /> : name}
+          
                 </button>
               )
             }))

@@ -3,10 +3,9 @@
 import { MathJax } from "better-react-mathjax";
 import React, { ReactElement, useMemo, useState } from "react";
 import { Quaternion } from "three";
-import { SectionTitle } from "./SectionTitle";
-import { MemoizedMathJax } from "../ui/MemoizedMathJax";
 
 
+/*
 const decimalToExtendedReal = function( decimal: number, roots_adjoined: number[] ) {
     // For example, if roots_adjoined is [2], then the number 1 + sqrt(2) is represented as [1, 1]
     // We want to search from zero all the numbers around zero to see if some combination of a + b sqrt(2) is equal to the decimal.
@@ -27,7 +26,7 @@ const decimalToExtendedReal = function( decimal: number, roots_adjoined: number[
         }
     }
     return [decimal, 0]
-}
+}*/
 
 const fractions = [  
     [0, 1], [1, 1], [1, 2], [1, 3], [2, 3], [1, 4], [3, 4], [1, 5], [2, 5], [3, 5], [4, 5], [1, 6], [5, 6],
