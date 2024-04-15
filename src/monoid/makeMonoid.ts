@@ -49,13 +49,13 @@ export const makeMonoidFromEdgeList = function(edges: [number, number][][]) {
 export const makeMonoidFromGeometry = function(geom: BufferGeometry, degree: number, name: string, extraRotations = []) : IndexedFGM<E3> {
     const center = new Vector3(0, 0, 0);
     const points =  getPointsFromGeom(geom);
-    const rotations = points.map(point => new Quaternion().setFromAxisAngle(point.normalize(), Math.PI * 2 / degree).normalize());
+    const rotations = points.map((point, i) => new Quaternion().setFromAxisAngle(point.normalize(), Math.PI * 2 / degree).normalize());
     Array.prototype.push.apply(rotations, extraRotations);
     const monoid: FinitelyGeneratedMonoid<E3> = {
         generators: rotations.map((rotation) => ({ rotation, position: center })),
         identity: { rotation: ROT_ID, position: center },
-        multiply: ({ rotation: r1, position: p1 }, { rotation: r2, position: p2 }) => ({ rotation: new Quaternion().multiplyQuaternions(r2, r1), position: new Vector3().addVectors(p1, p2) })
-        ,name
+        multiply: ({ rotation: r1, position: p1 }, { rotation: r2, position: p2 }) => ({ rotation: new Quaternion().multiplyQuaternions(r2, r1), position: new Vector3().addVectors(p1, p2) }),
+        name
     }
     const returnMonoid =  indexMonoid(monoid, 0.01);
 
@@ -126,6 +126,37 @@ export const makeEmbeddedSubmonoid = function<T>(m: IndexedFGM<T>, generators: I
      return monoid;
 }
 type HasName = { name: string };
+export const compressElementName = function(name: string) : string {
+
+    let count = 1;
+    let newName = "";
+    const parsed = name.split(/(?=[a-z])/)
+    // renderL takes a char and an integer
+    const render = (el: string, count: number) => {
+        // only ever x or x^-1
+        if (count == 1) return el;
+        if (el.length == 1) {
+            return `${el}^{${count}}`;
+        } else {
+            return `${el[0]}^{-${count}}`;
+        }
+    }
+
+    for (let i = 1; i < parsed.length; i++) {
+        if (parsed[i] === parsed[i - 1]) {
+            count++;
+        } else {
+            newName += render(parsed[i - 1], count);
+            count = 1;
+        }
+    }
+    console.log( "Before", newName, parsed[parsed.length - 1], count)
+    newName += render(parsed[parsed.length - 1], count)
+    console.log("after", newName);
+    
+
+    return newName;
+}
 export const  labelMonoid = function<T>(m: IndexedFGM<T>, generators: { el: Indexed<T>, name: string }[]): IndexedFGM<T> {
     // update the typescript types later to accomodate a name parameter
     const values: (Indexed<T> & HasName)[] = [{...m.identity, name: "" }];
@@ -163,29 +194,8 @@ export const  labelMonoid = function<T>(m: IndexedFGM<T>, generators: { el: Inde
     }
     values[0].name = "e";
 
-    for (const element of values) {
-        let name = element.name;
-        let count = 1;
-        let newName = "";
-        for (let i = 1; i < name.length; i++) {
-            if (name[i] === name[i - 1]) {
-                count++;
-            } else {
-                if (count > 1) {
-                    newName += `${name[i - 1]}^${count}`;
-                } else {
-                    newName += name[i - 1];
-                }
-                count = 1;
-            }
-        }
-        if (count > 1) {
-            newName += `${name[name.length - 1]}^${count}`;
-        } else {
-            newName += name[name.length - 1];
-        }
-        element.name = newName;
-    }
+    values.forEach((element) => { element.name = compressElementName(element.name) });
+    
     return {
         ...m,
         multiply: function(a: Indexed<T>, b: Indexed<T>) {

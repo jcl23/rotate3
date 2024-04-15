@@ -51,13 +51,13 @@ export const enumerateOrbits = (monoid: IndexedFGM<any>) => {
     while (current.index != 0) {
       prev = current;
       current = monoid.multiply(current, element);
-      console.log(current.index);
+      //console.log(current.index);
       order++;
     }   
     orders[order] ??= [];
     orders[order].push(prev);
   }
-  console.log({orders});
+  //console.log({orders});
   
   const orderKeys = Object.keys(orders).map((key) => parseInt(key)).sort((a, b) => a - b);
   // Starting low, enumerate the orbits and remove them from some list
@@ -72,7 +72,7 @@ export const enumerateOrbits = (monoid: IndexedFGM<any>) => {
       let orbit: number[] = [];
       while (current.index != 0) {
         unseen.delete(current.index);
-        console.log(current, element);
+        //console.log(current, element);
         orbit.push(current.index);
         current = monoid.multiply(current, element);
       }  
@@ -80,8 +80,8 @@ export const enumerateOrbits = (monoid: IndexedFGM<any>) => {
     }
     orbits[order] = (orbitSet);
   }
-  console.log("ORBITS");
-  console.warn({orbits});
+  //console.log("ORBITS");
+  //console.warn({orbits});
   return orbits;
 }
   
@@ -110,7 +110,7 @@ export const enumeratePairs = function(monoid: IndexedFGM<any>) {
         // generated[size] = [...new Set(generated[size])];
       }
     }
-    console.log({pairs});
+    //console.log({pairs});
     const key = `${o1}-${o2}`;
     ret[key] = generated;
   }
@@ -120,7 +120,7 @@ export const enumeratePairs = function(monoid: IndexedFGM<any>) {
 
 export const SolidMonoids = {
   Cube: cubeMonoid,
-  Icosahedron: icoMonoid,
+  Icosahedron: dodecaMonoid,
   Tetrahedron: tetraMonoid,
   Octahedron: cubeMonoid,
   Dodecahedron: dodecaMonoid,

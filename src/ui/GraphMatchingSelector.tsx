@@ -34,9 +34,9 @@ type GraphMatchingSelectorProps = {
 };
 
 
-export const  GraphMatchingSelector = function ({ mainGroup, subgroupName, setHighlighted, edgeOrders, edges, vertices }: GraphMatchingSelectorProps) {
+export const  GraphMatchingSelector = function ({ mainGroup, shapeName, subgroupName, setHighlighted, edgeOrders, edges, vertices }: GraphMatchingSelectorProps) {
   
-  const subgroupIsomorphismClass = subgroupsData[mainGroup.name][subgroupName] ?? [];
+  const subgroupIsomorphismClass = subgroupsData[shapeName][subgroupName] ?? [];
   const subgroups = subgroupIsomorphismClass.conjugacyClasses.map((c) => c.members).flat();
   // by order, a list of indices of elements of the parent group, to be 
   // included as generators of the subgroup.

@@ -56,14 +56,14 @@ let groupData = {
     "Z_2": makePermutationGroup([[1, 0]], 2, "Z_2"),
     "Z_3": makePermutationGroup([[2, 0, 1]], 3, "Z_3"),
     "Z_4": makePermutationGroup([[3, 0, 1, 2]], 4, "Z_4"),
-    "D_4": makePermutationGroup([[3, 0, 1, 2], [1, 0, 3, 2]], 4, "D_4"),
+    "D_8": makePermutationGroup([[3, 0, 1, 2], [1, 0, 3, 2]], 4, "D_8"),
     "K_4": makePermutationGroup([[1, 0, 2, 3], [0, 1, 3, 2]], 4, "K_4"),
     "S_3": makePermutationGroup([[1, 0, 2], [0, 2, 1]], 3, "S_3"),
     "S_4": makePermutationGroup([[3, 0, 1, 2], [0, 3, 1, 2]], 4, "S_4"),
     
 } as Partial<Record<GroupName, IndexedFinExpMonoid<number[]>>>;
 
-let S3Els = groupData["D_4"].elements;
+let S3Els = groupData["D_8"].elements;
 if (S3Els) {
     console.log("S_3 elements: ", S3Els.length);
 }

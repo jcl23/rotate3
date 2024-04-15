@@ -71,7 +71,7 @@ export const Pointer = function({ transform, text, width }: CayleyGraphPointerPr
    
     height: "6%",
     background: "transparent",
-    border: "3px solid black",
+    border: "4px solid black",
     width: `${width}px`,
     borderRadius: '10px',
     padding: `2px 0px`,

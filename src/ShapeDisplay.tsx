@@ -2,7 +2,7 @@ import { CameraProps, Canvas, } from "@react-three/fiber";
 import { useRef, useState, useEffect, useMemo, useLayoutEffect } from "react";
 import { Quaternion, Vector3,  PerspectiveCamera, Camera, OrthographicCamera, Color, CanvasTexture, UVMapping, RepeatWrapping, PCFSoftShadowMap, BufferGeometry, Line, LineBasicMaterial, ExtrudeGeometry, Vector2, MeshBasicMaterial, Mesh, CylinderGeometry, MeshPhongMaterial } from "three";
 import { MyCamera } from "./Camera";
-import { defaultShapes } from "./DefaultMeshes";
+import { defaultShapes, secondaryShapes } from "./DefaultMeshes";
 import { E3  } from "./Display";
 import { Indexed } from "./monoid/IndexedMonoid";
 import { Step } from "./Shape";
@@ -16,6 +16,7 @@ const AXIS_RADIUS = 0.05;
 export type ShapeDisplayProps = {
     children?: JSX.Element | JSX.Element[];
     shape: keyof typeof defaultShapes;
+    secondaryShape: keyof typeof secondaryShapes;
     transform: Indexed<E3>;
     stepIndex: number;
     availableTransformations: Indexed<E3>[];
@@ -30,13 +31,20 @@ export type ShapeDisplayProps = {
 // map from a quaternion to a three fiber line, with width, representing the axis of rotation
 export const quaternionToAxis = function(numSegments: number) {
   return function(q: Quaternion) {
-    //const axis = new Vector3(q.x, q.y, q.z);
-    const x = new Vector3(1, 0, 0);
-    const y = new Vector3(0, 1, 0);
-    const z = new Vector3(0, 0, 1);
-
-   
-    const axis = new Vector3(q.x, q.y, q.z).normalize();
+     const axis = new Vector3(q.x, q.y, q.z).normalize();
+    const geometry = new CylinderGeometry(AXIS_RADIUS, AXIS_RADIUS, 5, numSegments);
+    // center the geometry
+    geometry.rotateX(Math.PI / 2);
+   // geometry.translate(0, AXIS_RADIUS, 0);
+    const material = new MeshPhongMaterial( { color: 0xffffff, reflectivity: 2 } );
+    const cylinder = new Mesh(geometry, material);
+    cylinder.lookAt(axis);
+    return cylinder;
+  }
+}
+export const quaternionToSecondaryShape = function(shapeName: string) {
+  return function(q: Quaternion) {
+     const axis = new Vector3(q.x, q.y, q.z).normalize();
     const geometry = new CylinderGeometry(AXIS_RADIUS, AXIS_RADIUS, 5, numSegments);
     // center the geometry
     geometry.rotateX(Math.PI / 2);
@@ -48,8 +56,10 @@ export const quaternionToAxis = function(numSegments: number) {
   }
 }
 
+
 export const ShapeDisplay = function ({
     shape,
+    secondaryShape = "Square",
     transform: { value: { rotation, position } },
     cameraType,
     
@@ -59,8 +69,6 @@ export const ShapeDisplay = function ({
   }: ShapeDisplayProps) {
     const shapeRef = useRef();
     
-    
-    const [localStepIndex, setLocalStepIndex] = useState(0);
   
     const [transformStep, setTransformStep] = useState<Step<E3>>({
       from: { rotation: new Quaternion(), position: new Vector3() } as Transform,
@@ -69,11 +77,11 @@ export const ShapeDisplay = function ({
   
 
     //const [cameraState, setCameraState] = useState<Camera>(new PerspectiveCamera(75, 1, 0.1, 1000));
-    let camera: Camera;
+   /* let camera: Camera;
         switch (cameraType) {
             case "perspective":
             camera = new PerspectiveCamera(75, 1, 0.1, 1000);
-            camera.position.set(1, 2, 3);
+            camera.position.set(4, 2, 3);
             break;
             case "front-facing":
               camera = new PerspectiveCamera(75, 1, 0.1, 1000);
@@ -84,7 +92,7 @@ export const ShapeDisplay = function ({
             camera = new OrthographicCamera(75, 1, 0.1, 1000);
             camera.position.set(0, 0, 3);
             break;
-        }
+        }*/
     
 
  
@@ -92,50 +100,38 @@ export const ShapeDisplay = function ({
       if (
         rotation.equals(transformStep.to.rotation) &&
         position.equals(transformStep.to.position)
-      )
+      ) {
+        console.log("Returned the same rotation")
         return;
+      } else {
+      }
+      console.log("Setting the rotation");
       setTransformStep({
         from: transformStep.to,
         to: { rotation, position },
       });
-    }, [rotation, position]);
-    
+    }, [rotation]);
+    useEffect(() => {
+      setTransformStep({
+        from: transformStep.to,
+        to: transformStep.to,
+      })
+    }, [shape])
     let dummy;
     const stableShape = useMemo(() => {
       console.log("ShapeDisplay ()", shape);  
       return (
         <>
-            <Shape ref={shapeRef} shape={shape}  transform={transformStep}  />
+            <Shape ref={shapeRef} shape={shape} generators={generators} secondary={secondaryShape ?? ""} transform={transformStep}  />
         </>
       )
-    }, [shape, dummy, transformStep]);
+    }, [generators, shape, transformStep]);
 
-    [transformStep, shape, cameraType].forEach((val) => {
-      useEffect(() => {
-        console.log("ShapeDisplay", shape);
-      }, [val])
-    });
-    useEffect(() => {
-      console.log("ShapeDisplay (shape)", shape);
-      dummy = shape;
-    }, [shape])
-    useEffect(() => {
-      console.log("ShapeDisplay (transformStep)", transformStep.from.rotation, transformStep.to.rotation);
-      dummy = transformStep;
-    }, [transformStep])
-    useEffect(() => {
-      console.log("ShapeDisplay (CameraType)", cameraType);
-      dummy = cameraType;
-    }, [cameraType])
+
     /*const setRotation = function (rotation: Quaternion) {
       setFromRotation(toRotation);
       setToRotation(rotation);
     };*/
-  
-    const [fromPosition, setFromPosition] = useState(new Vector3());
-    const [toPosition, setToPosition] = useState(new Vector3());
-  
-    const firstUpdate = useRef(true);
   
     /*useLayoutEffect(() => {
       if (firstUpdate.current) {
@@ -191,7 +187,13 @@ export const ShapeDisplay = function ({
               {/* below: a spotlight pointing straight down */}
                 
               {stableShape}
-              {generators.map(({value: {rotation}}) => rotation).map(quaternionToAxis(6), { lineWidth: 4 }).map((data, i) => <primitive key={`ShapeDisplay_prim[${i}]`} object={data} />)}
+              {generators.map(({value: {rotation}}) => rotation).map(quaternionToAxis(6), { lineWidth: 4 }).map((data, i) => { 
+                return ( <>
+                    <primitive key={`ShapeDisplay_prim[${i}]`} object={data} />
+                    
+                  </>
+                )
+              })}
               {children}
              
        

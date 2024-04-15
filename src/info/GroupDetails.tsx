@@ -37,9 +37,8 @@ export const GroupDetails = function({ group, generators }: GroupDetailsProps) {
                 <h4>Generators:</h4>   
                 {generators.map((generator, i) => {
                     return (
-                        <div style={{display: "flex", flexDirection: "row"}}>
-                            <h2 key={`generator_${i}`} style={{marginLeft: "10px"}}>{generator.name}=</h2>
-                            <DisplayQuaternion quaternion={generator.value.rotation} mode={"quaternion"}/>
+                        <div key={`GroupDetails_div[${i}]`} style={{display: "flex", textAlign: "left", marginBottom: "20px"}}>
+                            <DisplayQuaternion style={{fontSize: "20px"}} quaternion={generator.value.rotation} mode={"quaternion"} name={generator.name}/>
                         </div>
                     )
                 

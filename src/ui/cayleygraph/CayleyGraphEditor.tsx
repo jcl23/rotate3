@@ -95,7 +95,7 @@ export function CayleyGraphEditor({show, hide}: CayleyGraphEditorProps) {
             "vertices":[{"x":20,"y":20},{"x":60,"y":60},{"x":20,"y":180},{"x":140,"y":60},{"x":60,"y":140},{"x":180,"y":180},{"x":180,"y":20},{"x":140,"y":140}],
             "edges":[[[0,1],[1,0],[3,4],[4,3],[6,7],[7,6],[2,5],[5,2]],[[0,7],[7,5],[5,4],[4,0],[1,3],[3,2],[2,6],[6,1]]]
         };
-        setChosenGroup("D_4");
+        setChosenGroup("D_8");
         setNumGenerators(2);
         setVertices(vertices);
         setEdges(edges);
@@ -448,6 +448,7 @@ let subgroupNames = [...new Set(Object.values(subgroupsData).map(d => Object.key
                         edgeOrders={edgeOrders} 
                         edges={edges} 
                         vertices={vertices}
+                        shapeName={geomName}
                         setHighlighted={setHighlighted} 
                         setGeneratedEdges={setGeneratedEdges} 
                         setOutputString={setOutputString}

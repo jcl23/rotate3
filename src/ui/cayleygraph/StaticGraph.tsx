@@ -28,7 +28,7 @@ export const StaticGraph = function ({
     }
     let hue = edgeHues[generatorIndex % edgeColors.length];
     const color = `hsla(${hue}, 100%, ${50}%, 1)`;
-    const glassColor = `hsla(${hue}, 100%, ${80}%, 0.6)`;
+    const glassColor = `hsla(${hue}, 100%, ${80}%, 0.2)`;
     const div = document.createElement("div");
     const length = from.distanceTo(to);
     let slope = (to.y - from.y) / (to.x - from.x);
@@ -63,49 +63,28 @@ export const StaticGraph = function ({
     const dark = (0.5 + 0.2 * dot) * 100;
     const brightColor = `hsl(${hue}, ${100}%, ${bright}%)`;
     const darkColor = `hsl(${hue}, ${100}%, ${dark}}%)`;
-    return (
-      <>
-      <polyline
+    return ({
+      
+      back: <polyline
 
-points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
-stroke={glassColor}
-strokeWidth={6}
-/>
-      <polyline
+        points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
+        stroke={glassColor}
+        strokeWidth={6}
+      />,
+      front: <polyline
         markerMid={`url(#triangle${generatorIndex})`}
         vector-effect="non-scaling-stroke"
         points={`${from.x},${from.y} ${cx},${cy} ${to.x},${to.y}`}
         stroke={color}
-        strokeWidth={3}
+        strokeWidth={2}
         />
-        {/* 
-      <line
-        x1={from.x + shiftX}
-        y1={from.y + shiftY}
-        x2={to.x + shiftX}
-        y2={to.y + shiftY}
-        stroke={brightColor}
-        strokeWidth={1.5}
-        /> 
-        
-      <line
-        x1={from.x - shiftX}
-        y1={from.y - shiftY}
-        x2={to.x - shiftX}
-        y2={to.y - shiftY}
-        stroke={darkColor}
-        strokeWidth={1.5}
-      /> 
-    */}
-      
 
-
-        </>
-    );
+  });
   };
-
-  const listToReturn = edges
-    .map((list, listIndex) =>
+  const lineFronts = [];
+  const lineBacks = [];
+  edges
+    .forEach((list, listIndex) =>
       list.map(([i, j]) => {
         let p1: Vector3, p2: Vector3;
         try {
@@ -116,17 +95,13 @@ strokeWidth={6}
             `[StaticGraph] vertices[${i}] or vertices[${j}] is undefined, where vertices has length ${vertices.length}: `
           );
         }
-        return (
-          <React.Fragment key={`StaticGraph__edge[${i}][${j}]`}>
-            {toLine([p1, p2], listIndex)}
-          </React.Fragment>
-        );
+        const { front, back } = toLine([p1, p2], listIndex);
+        lineFronts.push(front);
+        lineBacks.push(back);
+
       })
     )
-    .flat(1);
-  return (
-    <>
-      {listToReturn}
-    </>
-  );
+   return    <React.Fragment key={`StaticGraph__edge[${0}][${0}]`}>
+            {lineBacks}{lineFronts}
+   </React.Fragment>
 };

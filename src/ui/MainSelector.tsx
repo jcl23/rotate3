@@ -38,7 +38,7 @@ export const MainSelector = function ({
   // const [geometryName, setGeometryName] = useState<GeometryName>("Tetrahedron");
   const outerGroup = SolidMonoids[geomName];
 
-  const availableIsoClasses: Record<SubgroupName<OuterGroupName>, IsomorphismClass> = (subgroupsData as SubgroupRecord)[outerGroup.name];
+  const availableIsoClasses: Partial<Record<SubgroupName<OuterGroupName>, IsomorphismClass>> = (subgroupsData as SubgroupRecord)[geomName];
   const subgroupKeyNames = Object.keys(availableIsoClasses) as SubgroupName<OuterGroupName>[];
   //const [selectedIsoClassIndex, setIsoClass] = useIndexState(availableIsoClassKeyList);
   const availableSubgroups: IsomorphismClass = availableIsoClasses[subgroupName];
@@ -52,7 +52,7 @@ export const MainSelector = function ({
     className += " " + props.className;
   }
   const defaultSubgroupName = defaultSubgroups[geomName];
-  const defaultSubgroup = subgroupsData[outerGroup.name][defaultSubgroupName];
+  const defaultSubgroup = subgroupsData[geomName][defaultSubgroupName];
   return (
     <div className={className}>
       <SectionTitle title="Geometry" />
@@ -93,8 +93,8 @@ export const MainSelector = function ({
 
         <div className="SelectorComponent__outer">
           {
-            conjugacyClasses.map((conjugacyClass, i) => conjugacyClass.members.map((subgroup, j) => {
-
+            conjugacyClasses.map((conjugacyClass, i, arr) => conjugacyClass.members.map((subgroup, j) => {
+              const name = arr.length <= 1 ? j + 1 : j + 1 + "ABC"[i];
               const isSelected = i == conjugacyClassIndex && j == indexInClass;
               return (
                 <button className={isSelected ? "selected" : undefined}
@@ -107,7 +107,7 @@ export const MainSelector = function ({
                     })
                   }} key={`SubgroupSelect_option#${i}_${j}`}>
                   <MathJax dynamic>
-                    {subgroup.name.length ? subgroup.name : `(${i}, ${j})`}
+                    {subgroup.name.length ? subgroup.name : name}
                   </MathJax>
                 </button>
               )

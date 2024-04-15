@@ -50,8 +50,8 @@ export const groupDetails: Record<GroupName, GroupDetails> = {
         order: 6,
         rank: 1
     },
-    D_4: {
-        name: "D_4",
+    D_8: {
+        name: "D_8",
         abstract: "The dihedral group of order 8.",
         order: 8,
         rank: 2

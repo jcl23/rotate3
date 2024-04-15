@@ -96,14 +96,14 @@ mjx-mtd:last-child {
   --button-inactive: rgb(59, 55, 55);
   --button-halfactive: rgb(161, 73, 57);
   --button-active: rgb(245, 202, 146);
-  --accent-dark: rgb(23, 16, 0);
+  --accent-dark: rgb(38, 38, 38);
   --theme-color: #ff5900; /* Change this to your desired theme color */
   --theme-color-dark:rgb(65, 23, 0); /* Change this to your desired theme color */
 
-  --BACKGROUND1: rgb(42, 42, 42);
+  --BACKGROUND1: rgb(64, 64, 64);
   --BACKGROUND2: #ffffff;
   --patternWidth: 50px;
-  --BACKGROUND-PRIMARY: radial-gradient(circle, rgb(24, 24, 24) 50%, rgb(14, 14, 14) 100%);
+  --BACKGROUND-PRIMARY: radial-gradient(circle, rgb(45, 45, 45) 50%, rgb(14, 14, 14) 100%);
   --TEXT: white;
   --background-outline: rgba(255, 255, 255, 0.227);
 }
@@ -364,34 +364,40 @@ body {
   background: var(--BACKGROUND-PRIMARY)!important;
 }
 
-.MonoidInput-bottom {
+.MonoidInput-bottom, .GroupInput-bottom {
   height: 200px;
 }
-.MonoidInput__buttons {
+.MonoidInput__generators, .GroupInput__generators {
   display: flex;
-}
-.MonoidInput__generators {
-  display: flex;
-  flex-direction: column;
+  flex-direction: row;
   width: 100%;
+  height: 100%;
   padding-bottom: 10px;
   padding-top: 5px;
 }
-.MonoidInput__generators > .generator-button {
-
+.generator-button {
+  backdrop-filter: brightness(0.8);
   color: #000000;
-  border: none;
+  border-width: 4px;
   /* make all of equal size, with flex*/
   width: calc(100% - 20px);
+  flex-grow: 1;
   margin-top: 10px;
   margin-left: 10px; 
   margin-right: 10px;
-  aspect-ratio: 1;
   border-radius: 10px;
   cursor: pointer;
 }
 
-.MonoidInput__buttons > .reset-button {
+.generator-column {
+  flex-grow: 1;
+  flex-basis: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.reset-button {
   height: 100%;
   margin-right: 0;
   margin-left: auto;
@@ -407,16 +413,16 @@ body {
 .shapeName {
 
 }
-.MonoidInput-top {
+.MonoidInput-top,.GroupInput-top {
   font-size: 40px;
   height: 80px;
   padding-left: 20px;
-  background: #c8d6ba;
+  background: #0002;
   margin-left: 10px;
   margin-right: 10px;
   border-width: 0px 10px;
   box-shadow: 0px 0px 4px 1px rgba(0, 0, 0, 0.5) inset;
-  color: #2f2f2f;
+  color: #d6d6d6;
 }
 .MonoidDisplay_outer {
   margin-top: 20px;
@@ -434,22 +440,34 @@ body {
 
   /* a shadow that starts fully opaque at the top, then fades vertically */
 }
-.MonoidInput-value  > span{
+.MonoidInput-value > span,.GroupInput-value > span{
   margin-top: 0px;
   vertical-align: text-bottom;
   height: 100%;
 }
-.MonoidInput-sequence > span {
+.MonoidInput-sequence > span,.GroupInput-sequence > span {
   width: min-content;
   height: 100%;
   margin-left: auto;
   margin-top: 0px;
 
 }
-.MonoidInput-sequence {
+.MonoidInput-sequence, .GroupInput-sequence {
   overflow-x: auto;
   overflow-y: hidden;
   width: 100%;
+}
+.MonoidInput__buttons, .GroupInput__buttons {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  padding-bottom: 10px;
+  padding-top: 5px;
+
+}
+
+.reset-button {
+  margin-top: 5px;
 }
 
 .fraction_top {
@@ -481,7 +499,7 @@ body {
   background: transparent;
 }
 mjx-mrow > mjx-mo:first-child, mjx-mrow > mjx-mo:last-child {
-  height: 150px;
+
 }
 mjx-stretchy-v {
   height: 100%!important;
@@ -509,6 +527,7 @@ mjx-mtd:not(:last-child) {
   max-width: 400px;
   height: 100%;
   padding: 30px;
+  
 }
 
 .QuaternionMatrix::before {
@@ -569,12 +588,18 @@ mjx-mtd:not(:last-child) {
   min-height: fit-content;
   padding-bottom: 20px;
 }
-.MonoidInput {
+.MonoidInput,.GroupInput {
   width: 100%;
+  display: flex;
+  flex-direction: column;
 }
-.MonoidInput-bottom {
+.GroupInput {
+  padding-top: 0px;
+}
+.MonoidInput-bottom,.GroupInput-bottom {
   display: flex;
   padding-top: 10px;
+  min-height: 240px;
 
 }
 /* not first child */
@@ -594,16 +619,19 @@ mjx-mtd:not(:last-child) {
 }
 .RightPanel {
   min-width: 300px;
-  max-width: calc(min(20%, 400px));
+  max-width: calc(min(20%, 600px));
 }
 .not-ready {
   border: 2px dashed #0004;
-  background-color: #ffffffc0;
+  background-color: #ffffff;
   font-family: Helvetica, Arial, sans-serif;
   font-weight: bold;
+  text-align: center;
+  padding-top: 40%;
+  vertical-align: middle;
   /* all caps */
   text-transform: uppercase;
-  font-size: 40px;
+  font-size: 25px;
 }
 .highlighted-vertex {
   filter: drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5));
@@ -658,7 +686,7 @@ border-style: solid;
 }
 .SectionTitle > h3 {
   font-weight: 200;
-  letter-spacing: 0.2em;
+  letter-spacing: 2pt;
   filter: drop-shadow(0px 0px 5px rgba(255, 255, 255, 0.5));
   /*font-family: Playfair Display, serif; */
   font-family: Helvetica, sans-serif;

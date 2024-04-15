@@ -4,6 +4,7 @@ import { MathJax } from "better-react-mathjax";
 import React, { ReactElement, useMemo, useState } from "react";
 import { Quaternion } from "three";
 import { SectionTitle } from "./SectionTitle";
+import { MemoizedMathJax } from "../ui/MemoizedMathJax";
 
 
 const decimalToExtendedReal = function( decimal: number, roots_adjoined: number[] ) {
@@ -34,59 +35,107 @@ const fractions = [
 ];
 // the above list, but where each fraction is a tuple of numerator and denominator
 
-const dict: Record<string, ReactElement> = {};
+const matrixDict: Record<string, ReactElement> = {};
+const quaternionDict: Record<string, (axis: number) => string> = {};
 const range = 5;
 const roots = [2, 3, 5];
 const hash = (c: number) => Math.round(c * 1618);
-const query = (c: number) => dict[hash(c)] ?? c;   
-dict[0] = <>0</>;
+const query = (c: number) => matrixDict[hash(c)] ?? c;   
+const quaternionQuery = (c: number) => quaternionDict[hash(c)] ?? c;
+matrixDict[0] = <>0</>;
 
 type QuaternionDisplayMode = "orthogonal" | "matrix" | "euler" | "axis-angle";
 // for loop: code begins here
 // for each root, and then for each choice of pair of coefficients, add the value to the dictionary with its representation as the string.
 for (let root of roots) {
-    for (let [n1, d1] of fractions) {
-        for (let [n2, d2] of fractions) {
-            const c1 = n1 / d1;
-            const c2 = n2 / d2;
+    for (let [wholeNum, wholeDenom] of fractions) {
+        for (let [radNum, radDenom] of fractions) {
+            const c1 = wholeNum / wholeDenom;
+            const c2 = radNum / radDenom;
             const value = c1 + c2 * Math.sqrt(root);
             const hashValue = hash(value);
-            if (dict[hashValue] !== undefined) {
+            if (matrixDict[hashValue] !== undefined) {
                 continue;
             }
            
-            const n1_str = (n1 == 1) ? n1 : (n1 == -1) ? "-1" : n1;
-            const symbol = (n2 == 0) ? "" : (n2 < 0 || n1 < 0) ? "-" : "+";
-            n2 = Math.abs(n2);
-            const n2_str = (n2 == 1) ? ""  : n2;
+            const wholeNum_str = (wholeNum == 1) ? wholeNum : (wholeNum == -1) ? "-1" : wholeNum;
+            const symbol = (radNum == 0) ? "" : (radNum < 0 || wholeNum < 0) ? "-" : "+";
+            radNum = Math.abs(radNum);
+            const radNum_str = (radNum == 1) ? ""  : radNum;
     
-            const c1_str = (d1 == 1) ? `${n1}` : `${n1_str}/${d1}`;
-            const c2_str = (d2 == 1) ? `${n2}` : `${n2_str}√${root}/${d2}`;
-            if (n1 == 0) {
-                if (n2 == 0) {
-                    dict[hashValue] = <>0</>;
+            const c1_str_flat = (wholeDenom == 1) ? `${wholeNum}` : `${wholeNum_str}/${wholeDenom}`;
+            const c2_str_flat = (radDenom == 1) ? `${radNum}` : `${radNum_str}√${root}/${radDenom}`;
+            const axisNames = ["", "\\bf i", "\\bf j", "\\bf k"];
+            
+            const formatRadCoef = function (axisIndex: number, n: number, root: number) {
+                if (n == 0) {
+                    return "0";
+                }
+                if (n == 1) {
+                    return `\\sqrt{${root}}${axisNames[axisIndex]}`;
+                } else if (n == -1) {
+                    return `-\\sqrt{${root}}${axisNames[axisIndex]}`;
+                }
+                return `${n}\\sqrt{${root}}${axisNames[axisIndex]}`;
+            }
+            const formatCoef = function (axisIndex: number, n: number) {
+                if (n == 0) {
+                    return "0";
+                }
+                if (n == 1) {
+                    if (axisIndex == 0) {
+                        return "1"
+                    } else {
+                        return axisNames[axisIndex];
+                    }
+                } else if (n == -1) {
+                    if (axisIndex == 0) {
+                        return "-1";
+                    } else {
+                        return `-${axisNames[axisIndex]}`;
+                    }
+                }
+                return `${n}${axisNames[axisIndex]}`;
+            } 
+            if (wholeNum == 0) {
+                if (radNum == 0) {
+                    matrixDict[hashValue] = <>0</>;
+                    quaternionDict[hashValue] = () => "0";
                     continue;
                 }
-                dict[hashValue] = <>{`${c2_str}`}</>;
+                matrixDict[hashValue] = <>{`${c2_str_flat}`}</>;
+                if (radDenom == 1) {
+                    quaternionDict[hashValue] = (i) => `${formatRadCoef(i, radNum, root)}`;
+                } else {
+                    quaternionDict[hashValue] = (i) => `\\frac{${formatRadCoef(i, radNum, root)}}{${radDenom}}`;
+                }
                 continue;   
             }
-            if (n2 == 0) {
-                dict[hashValue] = <>{`${c1_str}`}</>;
+            if (radNum == 0) {
+                matrixDict[hashValue] = <>{`${c1_str_flat}`}</>;
+                //quaternionDict[hashValue] = (i) => `${wholeNum_str}${axisNames[i]}`;
+                if (wholeDenom == 1) {
+                    quaternionDict[hashValue] = (i) => `${formatCoef(i, wholeNum)}`;
+                } else {
+                    quaternionDict[hashValue] = (i) => `\\frac{${formatCoef(i, wholeNum)}}{${wholeDenom}}`;
+                }
+
                 continue;
-            }
-            if (d1 == d2) {
-                dict[hashValue] =<><div className={"fraction_top"}>{`${n1_str} ${symbol} ${n2_str}√${root}`}</div><div className={"fraction_bottom"}>{`${d1}`}</div></>;
+            } else if (wholeDenom == radDenom) {
+                matrixDict[hashValue] =<><div className={"fraction_top"}>{`${wholeNum_str} ${symbol} ${radNum_str}√${root}`}</div><div className={"fraction_bottom"}>{`${wholeDenom}`}</div></>;
+                quaternionDict[hashValue] = (i) => `\\frac{${wholeNum_str} + ${radNum_str}\\sqrt{${root}}}{${wholeDenom}}${axisNames[i]}`;
             } else {
-                dict[hashValue] = <>{`${c1_str} ${symbol} ${c2_str}`}</>;
+                matrixDict[hashValue] = <>{`${c1_str_flat} ${symbol} ${c2_str_flat}`}</>;
+                quaternionDict[hashValue] = (i) => `\\frac{${wholeNum} + ${radNum_str}\\sqrt{${root}}}{${wholeDenom}}${axisNames[i]}`;
             }
         }
     }
 }
-console.log("Updated dict:", {dict})
+console.log("Updated matrixDict:", {matrixDict})
 
 const QuaternionDisplay = {
     
-    ["matrix"]: function(q: Quaternion, memo: Map<string, ReactElement>): ReactElement {
+    ["matrix"]: function(q: Quaternion, memo: Map<string, ReactElement>, name: string): ReactElement {
         let {w: w_raw, z: z_raw, x: x_raw, y: y_raw} = q;
         if (w_raw < 0) {
             w_raw = -w_raw;
@@ -160,7 +209,7 @@ const QuaternionDisplay = {
                 <div style={{ width: "10px", marginTop: "-3px", borderStyle: "solid", borderColor: "var(--TEXT)", borderWidth: "3px 0px 3px 3px", borderTopLeftRadius: "2.5px",  borderRight: "0px", borderBottomLeftRadius: "2.5px", marginRight: "-16px"}} />
                 {table}
             
-            <div style={{width: "10px", marginTop: "-3px",  border: "3px solid var(--TEXT)", borderLeft: "0px",  borderTopRightRadius: "2.5px", borderBottomRightRadius: "2.5px", marginLeft: "-16px"}} />
+                <div style={{width: "10px", marginTop: "-3px",  border: "3px solid var(--TEXT)", borderLeft: "0px",  borderTopRightRadius: "2.5px", borderBottomRightRadius: "2.5px", marginLeft: "-16px"}} />
             </div>
             )
             return String.raw`\begin{bmatrix}
@@ -171,7 +220,7 @@ const QuaternionDisplay = {
         \end{bmatrix}`
 
     },
-    ["quaternion"]: function(q: Quaternion): ReactElement  {
+    ["quaternion"]: function(q: Quaternion, memo: Map<string, ReactElement>, name: string ): ReactElement  {
         
         // format like xi + yj + zk (we don't include w because it is a rotation)
         let {w: w_raw, z: z_raw, x: x_raw, y: y_raw} = q;
@@ -182,26 +231,27 @@ const QuaternionDisplay = {
             y_raw = -y_raw;
             z_raw = -z_raw;
         }
-        let w = query(w_raw);
-        let x = query(x_raw);
-        let y = query(y_raw);
-        let z = query(z_raw);
-        let terms: ReactElement[] = [];
+        let w = quaternionQuery(w_raw);
+        let x = quaternionQuery(x_raw);
+        let y = quaternionQuery(y_raw);
+        let z = quaternionQuery(z_raw);
+        let terms: string[] = [];
         let notAlmostZero = (c: number) => Math.abs(c) > 0.0001;
         if (notAlmostZero(w_raw)) {
-            terms.push(<>{w}</>);
+            terms.push(w(0));
         }
         if (notAlmostZero(x_raw)) {
-            terms.push(<>({x})i</>);
+            terms.push(x(1));
         }
         if (notAlmostZero(y_raw)) {
-            terms.push(<>({y})j</>);
+            terms.push(y(2));
         }
         if (notAlmostZero(z_raw)) {
-            terms.push(<>({z})k</>);
+            terms.push(z(3));
         }
-        const sum = terms.reduce((prev, curr) => <>{prev} + {curr}</>);
-        return <div style={{fontFamily: "Georgia", lineHeight: 2, fontSize: "120%"}}>{sum}</div>;
+        let text = terms.reduce((prev, curr) =>prev + " + " + curr);
+        if (name != undefined) text = name + " = " + text;
+        return <MathJax className="MemoizedMathJax" hideUntilTypeset={"every"}>{String.raw`\[${text}\]`}</MathJax>
     },
     // temp
     ["orthogonal"]: function(q: Quaternion): string {
@@ -220,8 +270,9 @@ const QuaternionDisplay = {
 type QuaternionDisplayProps = {
     quaternion: Quaternion;
     mode: QuaternionDisplayMode;
+    name?: string,
 }
-export const DisplayQuaternion = ({ quaternion, mode = "matrix" }: QuaternionDisplayProps) => {
+export const DisplayQuaternion = ({ quaternion, name,  mode = "matrix", ...props }: QuaternionDisplayProps) => {
 
 
         // fractions: an array containing every fraction that is commonly used in representing rotations of degree 2, 3, 4, 5, or 6 in the complex plane.
@@ -229,6 +280,13 @@ export const DisplayQuaternion = ({ quaternion, mode = "matrix" }: QuaternionDis
     const memo = new Map<string, ReactElement>();
 
     console.log({query});
+    let style = {};
+    if (props.style) {
+        // create new object based on props.style, copy the stuff over
+        style = {...props.style};
+    }
+    style.color = "var(--TEXT)";
+    style.height = "calc(100% - 10px)";
         
     const titles = {
         "matrix": "Rotation Matrix",
@@ -237,8 +295,8 @@ export const DisplayQuaternion = ({ quaternion, mode = "matrix" }: QuaternionDis
         "euler": "Euler",
         "axis-angle": "Axis-Angle"
     }
-    return <div style={{color: "var(--TEXT)", height: "calc(100% - 10px)"}}>
-        {QuaternionDisplay[mode](quaternion, memo)}
+    return <div style={style}>
+        {QuaternionDisplay[mode](quaternion, memo, name)}
     </div>
     console.log(outstr);
     return (

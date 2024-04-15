@@ -8,13 +8,11 @@ import {
 
 import "./App.css";
 import { ShapeDisplay } from "./ShapeDisplay";
-import { FGIMonoidDisplay } from "./monoid/MonoidDisplay.tsx";
-import { E3 } from "./Display";
-import { Indexed, IndexedFGM, indexMonoid } from "./monoid/IndexedMonoid";
-import { enumerateOrbits, enumeratePairs, SolidMonoids } from "./data/platonicsolids.ts";
-import { CameraControls } from "./CameraControls";
+
+import { Indexed } from "./monoid/IndexedMonoid";
+import { enumeratePairs, SolidMonoids } from "./data/platonicsolids.ts";
+
 import { MainSelector } from "./ui/MainSelector.tsx";
-import { CameraType } from "./types/camera.ts";
 import subgroupDiagramData, {
   SubgroupDiagramData,
 } from "./data/subgroupDiagramData.ts";
@@ -23,9 +21,6 @@ import { CayleyGraph } from "./ui/cayleygraph/CayleyGraph.tsx";
 import subgroupsData, {
   ConjugacyClass,
   IsomorphismClass,
-  OuterGroupName,
-  SubgroupData,
-  SubgroupName,
 } from "./data/subgroupData";
 
 import { SubgroupChoice } from "./ui/SubgroupChoice.tsx";
@@ -38,24 +33,23 @@ import { CayleyGraphEditor } from "./ui/cayleygraph/CayleyGraphEditor.tsx";
 import { cayleyGraphData, getCayleyGraphData } from "./data/cayleyGraphData.ts";
 
 import { CayleyPanel } from "./ui/CayleyPanel.tsx";
-import useIndexState from "./hooks/useIndexedState.ts";
-import { Partial } from "@react-spring/web";
-import { sub } from "three/examples/jsm/nodes/Nodes.js";
+
 import { Header } from "./info/Header.tsx";
 import { findInverse } from "./group/invert.ts";
-import { MonoidInput } from "./ui/MonoidInput.tsx";
+
 import useMonoidState from "./hooks/useMonoidState.ts";
 import { MathJaxContext } from "better-react-mathjax";
-import { DisplayQuaternion } from "./info/DisplayQuaternion.tsx";
+
 import { MemoizedMathJax } from "./ui/MemoizedMathJax.tsx";
 import { set } from "firebase/database";
 import { Bound } from "./error/Bound.tsx";
 import { SectionTitle } from "./info/SectionTitle.tsx";
 import { GroupDetails } from "./info/GroupDetails.tsx";
+import { GroupInput } from "./ui/GroupInput.tsx";
 export const Controls = {};
 type QuaternionDisplayMode = "orthogonal" | "matrix" | "euler" | "axis-angle";
 const mathJaxConfig = {
-  fastPreview: true,
+  fastPreview: false,
   CommonHTML: { linebreaks: { automatic: true } },
            showMathMenu: true,
            'HTML-CSS': {
@@ -85,7 +79,7 @@ function App() {
     strictIndices: false,
     labelWithInverses: false,
     cameraType: {
-      options: ["perspective", "orthographic" ],
+      options: ["perspective" ],
     },
     quaternionDisplayMode: {
       options: [ "matrix", "orthogonal", "euler", "axis-angle", "quaternion"]
@@ -96,7 +90,7 @@ function App() {
   });
   Controls.controlVals = controlVals;
   const geomNameList = Object.keys(SolidMonoids) as GeometryName[];
-  const defaultGeomName = geomNameList[0];
+  const defaultGeomName = geomNameList[3]; // Octahedron
   const defaultGroupName= SolidMonoids[defaultGeomName].name as GroupName ;
   const defaultSubgroupName = "A_4";
   const defaultConjugacyClassIndex = 0;
@@ -115,20 +109,15 @@ function App() {
   const result = enumeratePairs(currentMonoid);
   console.log("EnumeratePairs", {result});
   // Which isomorphism class of subgroups to show (now safely)
-  const subgroupIsoClasses: IsomorphismClass[] = Object.values(
-    subgroupsData[groupName]
-  );
-  const subgroupNames = Object.keys(
-    subgroupsData[groupName]
-  ) as SubgroupName<OuterGroupName>[];
+
   
   const subgroupIsoClass: IsomorphismClass =
-  subgroupsData[groupName][subgroupName];
+  subgroupsData[geomName][subgroupName];
   const allConjugacyClasses: ConjugacyClass[] = [];
   const subgroupDiagramOnClick: Function[] = [];
 
   Object.entries(
-    subgroupsData[groupName]
+    subgroupsData[geomName]
   ).forEach(([groupName, data]) => {
       data.conjugacyClasses.forEach((cjClass, cjClassIndex) => {
          allConjugacyClasses.push(cjClass);
@@ -188,8 +177,8 @@ function App() {
   };*/
   useLayoutEffect(() => {
     // When the geometry changes, reset the subgroup class and choice indices, and the monoid value
-    resetMonoid();
-    enumerateOrbits(currentMonoid);
+    // resetMonoid();
+    // enumerateOrbits(currentMonoid);
   }, [geomName]);
   
   console.log("subgroupName: ", subgroupName);
@@ -232,6 +221,8 @@ function App() {
     // return obj.index;
     return elements.findIndex(({ index }) => index == obj.index);
   };
+
+  const secondaryShape = subgroupIsoClass.shape;
   return (
     <MathJaxContext config={mathJaxConfig}>
 <Bound>
@@ -267,8 +258,9 @@ function App() {
         <div >
       
           <div style={{ display: "flex", flexDirection:"column"  }}>
-            <h4 className="shapeName section-title" style={{width: "100%"}}>{`${geomName}`}</h4>
+            <h2 className="shapeName section-title" style={{width: "100%", fontFamily: "Helvetica", fontWeight: 400}}>{`${geomName}`}</h2>
             <ShapeDisplay
+            secondaryShape={secondaryShape}
             shape={geomName}
             cameraType={controlVals.cameraType}
             transform={monoidValue}
@@ -282,7 +274,7 @@ function App() {
         
           {controlVals.showCayleyGraph && (
             <div  style={{ display: "flex", flexDirection:"column"  }}>
-            <h4 className="shapeName section-title" style={{width: "100%", paddingLeft: "7%", paddingBottom: "11px"}}><MemoizedMathJax formula={`\\[${groupName}\\]`}/></h4>
+            <h4 className="shapeName section-title" style={{width: "86%", paddingTop: "10px", paddingLeft: "7%", paddingBottom: "5px", fontSize: "25px"}}><MemoizedMathJax formula={`\\[${subgroupIsoClass.displayName}\\]`}/></h4>
 
               <CayleyGraph
               
@@ -299,6 +291,7 @@ function App() {
   
 
           </div>
+              {/* 
           <button onClick={() => setShowCGEditor(true)}>
               Cayley Graph Editor
             </button>
@@ -311,7 +304,7 @@ function App() {
             </button>
             
 
-            {/* <FGIMonoidDisplay<E3>
+            <FGIMonoidDisplay<E3>
               shape={geomName}
               monoid={currentMonoid}
               availableTransformations={transformations}
@@ -322,7 +315,8 @@ function App() {
             /> 
             */}
             
-            <MonoidInput 
+            <GroupInput 
+            m={labeledSubgroup}
             labels={labels}
             append={appendMonoidValue} reset={resetMonoid} monoidValue={monoidValue} currentSequence={currentSequence} generators={controlVals.useAllValues ? labeledSubgroup.elements : labeledSubgroup.generators}              
              

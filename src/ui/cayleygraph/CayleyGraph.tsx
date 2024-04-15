@@ -58,7 +58,6 @@ export const CayleyGraph = function ({
 if (status == false) return <div 
   className={"CayleyGraph__outer labelled not-ready"}
   style={{
-    padding: "20px",
     height: "calc(100% - 2* 20px)",
   }}
 >
