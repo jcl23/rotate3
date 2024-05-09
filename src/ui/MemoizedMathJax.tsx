@@ -8,7 +8,7 @@ type MemoizedMathJaxProps = {
 export const MemoizedMathJax = function({ formula, ...props }: MemoizedMathJaxProps) {
     const element = useMemo(() => {
         if (!formula.startsWith("\\[")) formula = "\\[" + formula + "\\]";
-        return <MathJax className="MemoizedMathJax" hideUntilTypeset={"every"} {...props}>{formula ?? "ERR"}</MathJax>
+        return <MathJax className="MemoizedMathJax" hideUntilTypeset={"every"} {...props} dynamic>{formula ?? "ERR"}</MathJax>
     }, [formula]);
 
 

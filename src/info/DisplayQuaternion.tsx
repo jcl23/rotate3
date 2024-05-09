@@ -250,7 +250,7 @@ const QuaternionDisplay = {
         }
         let text = terms.reduce((prev, curr) =>prev + " + " + curr);
         if (name != undefined) text = name + " = " + text;
-        return <MathJax className="MemoizedMathJax" hideUntilTypeset={"every"}>{String.raw`\[${text}\]`}</MathJax>
+        return <MathJax className="MemoizedMathJax" hideUntilTypeset={"every"} dynamic>{String.raw`\[${text}\]`}</MathJax>
     },
     // temp
     ["orthogonal"]: function(q: Quaternion): string {
@@ -297,7 +297,7 @@ export const DisplayQuaternion = ({ quaternion, name,  mode = "matrix", ...props
     return <div style={style}>
         {QuaternionDisplay[mode](quaternion, memo, name)}
     </div>
-    // console.log(outstr);
+    console.log(outstr);
     return (
             
                 <table>

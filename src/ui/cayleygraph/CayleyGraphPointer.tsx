@@ -75,7 +75,7 @@ export const Pointer = function({ transform, text, width }: CayleyGraphPointerPr
     width: `${width}px`,
     borderRadius: '10px',
     padding: `2px 0px`,
-    boxShadow: "0px 0px 0px 1px #000000",
+    boxShadow: "rgba(255,255,255,0.4) 0px -0.2px 0px 5px",
     // width: `${textRef.current?.getComputedStyle().width ?? 0}px`,
  };
  const position = transform.to;
